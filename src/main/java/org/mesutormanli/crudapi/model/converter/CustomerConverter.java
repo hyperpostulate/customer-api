@@ -5,7 +5,7 @@ import org.mesutormanli.crudapi.model.entity.CustomerEntity;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CustomerEntityConverter {
+public class CustomerConverter {
     public CustomerDto toDto(CustomerEntity entity) {
         if (entity == null) {
             return null;
