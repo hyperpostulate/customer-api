@@ -1,6 +1,7 @@
 package org.mesutormanli.crudapi.controller;
 
 import org.mesutormanli.crudapi.model.dto.CustomerDto;
+import org.mesutormanli.crudapi.model.request.CustomerRequest;
 import org.mesutormanli.crudapi.model.response.CustomerListResponse;
 import org.mesutormanli.crudapi.service.CustomerService;
 import org.springframework.http.ResponseEntity;
@@ -18,8 +19,8 @@ public class CustomerController {
     }
 
     @GetMapping(CUSTOMER_BASE_URL + "/{id}")
-    public ResponseEntity<CustomerListResponse> getCustomerById(@PathVariable Long id) {
-        return customerService.getCustomerById(id);
+    public ResponseEntity<CustomerListResponse> getCustomer(@PathVariable Long id) {
+        return customerService.getCustomer(id);
     }
 
     @GetMapping(CUSTOMER_BASE_URL)
@@ -28,7 +29,14 @@ public class CustomerController {
     }
 
     @PostMapping(CUSTOMER_BASE_URL)
-    public ResponseEntity<Long> createCustomer(@RequestBody CustomerDto dto) {
-        return customerService.createCustomer(dto);
+    public ResponseEntity<CustomerDto> createCustomer(@RequestBody CustomerRequest request) {
+        return customerService.createCustomer(request);
     }
+
+    @PutMapping(CUSTOMER_BASE_URL + "/{id}")
+    public ResponseEntity<CustomerDto> updateCustomer(@PathVariable Long id, @RequestBody CustomerRequest request) {
+        return customerService.updateCustomer(id, request);
+    }
+
+
 }
