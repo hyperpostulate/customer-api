@@ -13,10 +13,6 @@ public class CustomerListResponse implements Serializable {
         return customers;
     }
 
-    public void setCustomers(List<CustomerDto> customers) {
-        this.customers = customers;
-    }
-
     public CustomerListResponse customers(List<CustomerDto> customers) {
         this.customers = customers;
         return this;

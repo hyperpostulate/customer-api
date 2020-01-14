@@ -14,7 +14,12 @@ public class CustomerConverter {
             return new CustomerDto()
                     .id(entity.getId())
                     .name(entity.getName())
-                    .age(entity.getAge());
+                    .age(entity.getAge())
+                    .address(entity.getAddress())
+                    .telephone(entity.getTelephone())
+                    .email(entity.getEmail())
+                    .nationality(entity.getNationality())
+                    .maritalStatus(entity.getMaritalStatus());
         }
     }
 
@@ -24,7 +29,12 @@ public class CustomerConverter {
         } else {
             return new CustomerEntity()
                     .name(request.getName())
-                    .age(request.getAge());
+                    .age(request.getAge())
+                    .address(request.getAddress())
+                    .telephone(request.getTelephone())
+                    .email(request.getEmail())
+                    .nationality(request.getNationality())
+                    .maritalStatus(request.getMaritalStatus());
         }
     }
 
