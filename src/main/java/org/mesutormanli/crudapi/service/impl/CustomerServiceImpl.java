@@ -15,6 +15,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -60,10 +61,11 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public ResponseEntity<CustomerDto> updateCustomer(Long id, CustomerRequest request) {
-        if (!repository.existsById(id)) {
+        final Optional<CustomerEntity> optionalCustomerEntity = repository.findById(id);
+        if (!optionalCustomerEntity.isPresent()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else {
-            final CustomerEntity toBeUpdated = repository.findById(id).get()
+            final CustomerEntity toBeUpdated = optionalCustomerEntity.get()
                     .name(request.getName())
                     .age(request.getAge());
             final CustomerEntity saved = repository.save(toBeUpdated);

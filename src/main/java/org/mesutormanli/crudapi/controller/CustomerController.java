@@ -8,10 +8,10 @@ import org.mesutormanli.crudapi.service.CustomerService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import static org.mesutormanli.crudapi.controller.CustomerEndpoint.*;
+
 @RestController
 public class CustomerController {
-
-    private static final String CUSTOMER_BASE_URL = "/customer";
 
     private final CustomerService customerService;
 
@@ -19,8 +19,8 @@ public class CustomerController {
         this.customerService = customerService;
     }
 
-    @GetMapping(CUSTOMER_BASE_URL + "/{id}")
-    public ResponseEntity<CustomerListResponse> getCustomer(@PathVariable Long id) {
+    @GetMapping(CUSTOMER_URL_WITH_ID)
+    public ResponseEntity<CustomerListResponse> getCustomer(@PathVariable(ID) Long id) {
         return customerService.getCustomer(id);
     }
 
@@ -34,13 +34,13 @@ public class CustomerController {
         return customerService.createCustomer(request);
     }
 
-    @PutMapping(CUSTOMER_BASE_URL + "/{id}")
-    public ResponseEntity<CustomerDto> updateCustomer(@PathVariable Long id, @RequestBody CustomerRequest request) {
+    @PutMapping(CUSTOMER_URL_WITH_ID)
+    public ResponseEntity<CustomerDto> updateCustomer(@PathVariable(ID) Long id, @RequestBody CustomerRequest request) {
         return customerService.updateCustomer(id, request);
     }
 
-    @DeleteMapping(CUSTOMER_BASE_URL + "/{id}")
-    public ResponseEntity<CustomerDeleteResponse> deleteCustomer(@PathVariable Long id) {
+    @DeleteMapping(CUSTOMER_URL_WITH_ID)
+    public ResponseEntity<CustomerDeleteResponse> deleteCustomer(@PathVariable(ID) Long id) {
         return customerService.deleteCustomer(id);
     }
 
