@@ -16,28 +16,56 @@ public class CustomerRequest implements Serializable {
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public Integer getAge() {
         return age;
+    }
+
+    public void setAge(Integer age) {
+        this.age = age;
     }
 
     public String getAddress() {
         return address;
     }
 
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
     public String getTelephone() {
         return telephone;
+    }
+
+    public void setTelephone(String telephone) {
+        this.telephone = telephone;
     }
 
     public String getEmail() {
         return email;
     }
 
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     public String getNationality() {
         return nationality;
     }
 
+    public void setNationality(String nationality) {
+        this.nationality = nationality;
+    }
+
     public String getMaritalStatus() {
         return maritalStatus;
+    }
+
+    public void setMaritalStatus(String maritalStatus) {
+        this.maritalStatus = maritalStatus;
     }
 
     @Override
