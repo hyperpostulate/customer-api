@@ -37,6 +37,11 @@ public class CustomerEntity {
         return id;
     }
 
+    public CustomerEntity id(Long id) {
+        this.id = id;
+        return this;
+    }
+
     public String getName() {
         return name;
     }

@@ -3,7 +3,6 @@ package org.mesutormanli.crudapi.controller;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mesutormanli.crudapi.base.BaseControllerTest;
-import org.mesutormanli.crudapi.builder.GenericMockDataBuilder;
 import org.mesutormanli.crudapi.model.dto.CustomerDto;
 import org.mesutormanli.crudapi.model.request.CustomerRequest;
 import org.mesutormanli.crudapi.model.response.CustomerDeleteResponse;
@@ -11,11 +10,9 @@ import org.mesutormanli.crudapi.model.response.CustomerListResponse;
 import org.mesutormanli.crudapi.service.CustomerService;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import java.util.Collections;
-
+import static org.mesutormanli.crudapi.builder.CustomerMockDataBuilder.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -35,34 +32,12 @@ class CustomerControllerTest extends BaseControllerTest {
 
     @BeforeEach
     void setUp() {
-        customerListResponse = generateCustomerListResponse();
+        customerListResponse = generateCustomerListResponse(CUSTOMER_ID);
         customerRequest = generateCustomerRequest();
-        customerResponse = generateCustomerResponse();
+        customerResponse = generateCustomerResponse(CUSTOMER_ID);
         customerDeleteResponse = generateCustomerDeleteResponse();
     }
 
-    private ResponseEntity<CustomerListResponse> generateCustomerListResponse() {
-        return new ResponseEntity<>(new CustomerListResponse().customers(Collections.singletonList(generateCustomerDto())), HttpStatus.OK);
-    }
-
-    private CustomerRequest generateCustomerRequest() {
-        return GenericMockDataBuilder.of(CustomerRequest.class).build();
-    }
-
-    private ResponseEntity<CustomerDto> generateCustomerResponse() {
-        return new ResponseEntity<>(generateCustomerDto(), HttpStatus.OK);
-    }
-
-    private ResponseEntity<CustomerDeleteResponse> generateCustomerDeleteResponse() {
-        return new ResponseEntity<>(new CustomerDeleteResponse().deletedCustomerCount((long) 1), HttpStatus.OK);
-    }
-
-    private CustomerDto generateCustomerDto() {
-        return GenericMockDataBuilder.of(CustomerDto.class)
-                .excludeField("id")
-                .build()
-                .id(CUSTOMER_ID);
-    }
 
     @Test
     void getCustomer() throws Exception {
