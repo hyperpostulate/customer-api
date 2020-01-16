@@ -9,9 +9,9 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>org.mesutormanli</groupId>
-    <artifactId>crud-api</artifactId>
+    <artifactId>customer-api</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>crud-api</name>
+    <name>customer-api</name>
     <description>REST Api for a SQLite Database</description>
 
     <properties>
