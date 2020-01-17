@@ -130,4 +130,5 @@ class CustomerServiceTest extends BaseServiceTest {
         final ResponseEntity<CustomerDeleteResponse> response = customerService.deleteAllCustomers();
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
     }
+
 }
