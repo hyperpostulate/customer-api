@@ -28,4 +28,5 @@ class CustomerConverterTest extends BaseServiceTest {
         final CustomerEntity customerEntity = customerConverter.toEntity(null);
         assertNull(customerEntity);
     }
+
 }
