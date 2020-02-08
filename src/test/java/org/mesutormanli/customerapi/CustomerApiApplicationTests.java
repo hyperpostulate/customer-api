@@ -8,6 +8,8 @@ class CustomerApiApplicationTests {
 
     @Test
     void contextLoads() {
+        String[] args = {""};
+        CustomerApiApplication.main(args);
     }
 
 }
