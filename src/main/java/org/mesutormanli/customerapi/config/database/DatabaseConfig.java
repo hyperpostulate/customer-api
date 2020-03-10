@@ -17,6 +17,9 @@ import java.util.Properties;
 @EnableJpaRepositories(basePackages = "org.mesutormanli.customerapi.repository")
 public class DatabaseConfig {
 
+    private static final String HIBERNATE_HBM_2_DDL_AUTO = "hibernate.hbm2ddl.auto";
+    private static final String HIBERNATE_DIALECT = "hibernate.dialect";
+    private static final String HIBERNATE_SHOW_SQL = "hibernate.show_sql";
     private final Environment env;
 
     public DatabaseConfig(Environment env) {
@@ -45,14 +48,14 @@ public class DatabaseConfig {
 
     private Properties additionalProperties() {
         final Properties hibernateProperties = new Properties();
-        if (env.getProperty("hibernate.hbm2ddl.auto") != null) {
-            hibernateProperties.setProperty("hibernate.hbm2ddl.auto", env.getProperty("hibernate.hbm2ddl.auto"));
+        if (env.getProperty(HIBERNATE_HBM_2_DDL_AUTO) != null) {
+            hibernateProperties.setProperty(HIBERNATE_HBM_2_DDL_AUTO, env.getProperty(HIBERNATE_HBM_2_DDL_AUTO));
         }
-        if (env.getProperty("hibernate.dialect") != null) {
-            hibernateProperties.setProperty("hibernate.dialect", env.getProperty("hibernate.dialect"));
+        if (env.getProperty(HIBERNATE_DIALECT) != null) {
+            hibernateProperties.setProperty(HIBERNATE_DIALECT, env.getProperty(HIBERNATE_DIALECT));
         }
-        if (env.getProperty("hibernate.show_sql") != null) {
-            hibernateProperties.setProperty("hibernate.show_sql", env.getProperty("hibernate.show_sql"));
+        if (env.getProperty(HIBERNATE_SHOW_SQL) != null) {
+            hibernateProperties.setProperty(HIBERNATE_SHOW_SQL, env.getProperty(HIBERNATE_SHOW_SQL));
         }
         return hibernateProperties;
     }
