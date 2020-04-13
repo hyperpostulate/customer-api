@@ -27,7 +27,7 @@ public class PersistenceConfig {
     public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
         final LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
         em.setDataSource(dataSource());
-        em.setPackagesToScan(env.getProperty("packagesToScan"));
+        em.setPackagesToScan(env.getProperty("entityManagerFactory.packagesToScan"));
         em.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
         em.setJpaProperties(jpaProperties());
         return em;
@@ -36,8 +36,8 @@ public class PersistenceConfig {
     @Bean
     public DataSource dataSource() {
         final DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setDriverClassName(env.getProperty("driverClassName"));
-        dataSource.setUrl(env.getProperty("url"));
+        dataSource.setDriverClassName(env.getProperty("dataSource.driverClassName"));
+        dataSource.setUrl(env.getProperty("dataSource.url"));
         return dataSource;
     }
 
