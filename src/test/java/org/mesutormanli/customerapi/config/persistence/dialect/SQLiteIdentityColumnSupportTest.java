@@ -1,4 +1,4 @@
-package org.mesutormanli.customerapi.config.database.dialect;
+package org.mesutormanli.customerapi.config.persistence.dialect;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,15 +9,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SQLiteIdentityColumnSupportTest {
-    private static String TABLE = "CUSTOMER";
-    private static String COLUMN = "id";
-    private static int TYPE = Types.INTEGER;
+    private static final String TABLE = "CUSTOMER";
+    private static final String COLUMN = "id";
+    private static final int TYPE = Types.INTEGER;
 
-    private SQLiteIdentityColumnSupport sqLiteIdentityColumnSupport;
+    private SQLiteDialect.SQLiteIdentityColumnSupport sqLiteIdentityColumnSupport;
 
     @BeforeEach
     void setUp() {
-        sqLiteIdentityColumnSupport = new SQLiteIdentityColumnSupport();
+        sqLiteIdentityColumnSupport = new SQLiteDialect.SQLiteIdentityColumnSupport();
     }
 
     @Test

@@ -12,6 +12,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.ResponseEntity;
 
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mesutormanli.customerapi.builder.CustomerMockDataBuilder.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -40,11 +41,15 @@ class CustomerControllerTest extends BaseControllerTest {
 
 
     @Test
-    void getCustomer() throws Exception {
+    void getCustomer() {
         when(customerService.getCustomer(CUSTOMER_ID)).thenReturn(customerListResponse);
-        mockMvc.perform(get(CustomerEndpoint.CUSTOMER_URL_WITH_ID, CUSTOMER_ID))
-                .andDo(print())
-                .andExpect(status().isOk());
+        try {
+            mockMvc.perform(get("/customer/{id}", CUSTOMER_ID))
+                    .andDo(print())
+                    .andExpect(status().isOk());
+        } catch (Exception e) {
+            fail(e);
+        }
 
         verify(customerService, times(1)).getCustomer(CUSTOMER_ID);
         verifyNoMoreInteractions(customerService);
@@ -52,62 +57,82 @@ class CustomerControllerTest extends BaseControllerTest {
 
 
     @Test
-    void getAllCustomers() throws Exception {
+    void getAllCustomers() {
         when(customerService.getAllCustomers()).thenReturn(customerListResponse);
-        mockMvc.perform(get(CustomerEndpoint.CUSTOMER_BASE_URL))
-                .andDo(print())
-                .andExpect(status().isOk());
+        try {
+            mockMvc.perform(get("/customer"))
+                    .andDo(print())
+                    .andExpect(status().isOk());
+        } catch (Exception e) {
+            fail(e);
+        }
 
         verify(customerService, times(1)).getAllCustomers();
         verifyNoMoreInteractions(customerService);
     }
 
     @Test
-    void createCustomer() throws Exception {
+    void createCustomer() {
         when(customerService.createCustomer(customerRequest)).thenReturn(customerResponse);
 
-        mockMvc.perform(post(CustomerEndpoint.CUSTOMER_BASE_URL)
-                .contentType(contentType)
-                .content(json(customerRequest))
-        )
-                .andDo(print())
-                .andExpect(status().isOk());
+        try {
+            mockMvc.perform(post("/customer")
+                    .contentType(contentType)
+                    .content(json(customerRequest))
+            )
+                    .andDo(print())
+                    .andExpect(status().isOk());
+        } catch (Exception e) {
+            fail(e);
+        }
 
         verify(customerService, times(1)).createCustomer(customerRequest);
         verifyNoMoreInteractions(customerService);
     }
 
     @Test
-    void updateCustomer() throws Exception {
+    void updateCustomer() {
         when(customerService.updateCustomer(CUSTOMER_ID, customerRequest)).thenReturn(customerResponse);
-        mockMvc.perform(put(CustomerEndpoint.CUSTOMER_URL_WITH_ID, CUSTOMER_ID)
-                .contentType(contentType)
-                .content(json(customerRequest))
-        )
-                .andDo(print())
-                .andExpect(status().isOk());
+        try {
+            mockMvc.perform(put("/customer/{id}", CUSTOMER_ID)
+                    .contentType(contentType)
+                    .content(json(customerRequest))
+            )
+                    .andDo(print())
+                    .andExpect(status().isOk());
+        } catch (Exception e) {
+            fail(e);
+        }
 
         verify(customerService, times(1)).updateCustomer(CUSTOMER_ID, customerRequest);
         verifyNoMoreInteractions(customerService);
     }
 
     @Test
-    void deleteCustomer() throws Exception {
+    void deleteCustomer() {
         when(customerService.deleteCustomer(CUSTOMER_ID)).thenReturn(customerDeleteResponse);
-        mockMvc.perform(delete(CustomerEndpoint.CUSTOMER_URL_WITH_ID, CUSTOMER_ID))
-                .andDo(print())
-                .andExpect(status().isOk());
+        try {
+            mockMvc.perform(delete("/customer/{id}", CUSTOMER_ID))
+                    .andDo(print())
+                    .andExpect(status().isOk());
+        } catch (Exception e) {
+            fail(e);
+        }
 
         verify(customerService, times(1)).deleteCustomer(CUSTOMER_ID);
         verifyNoMoreInteractions(customerService);
     }
 
     @Test
-    void deleteAllCustomers() throws Exception {
+    void deleteAllCustomers() {
         when(customerService.deleteAllCustomers()).thenReturn(customerDeleteResponse);
-        mockMvc.perform(delete(CustomerEndpoint.CUSTOMER_BASE_URL))
-                .andDo(print())
-                .andExpect(status().isOk());
+        try {
+            mockMvc.perform(delete("/customer"))
+                    .andDo(print())
+                    .andExpect(status().isOk());
+        } catch (Exception e) {
+            fail(e);
+        }
 
         verify(customerService, times(1)).deleteAllCustomers();
         verifyNoMoreInteractions(customerService);

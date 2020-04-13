@@ -1,4 +1,4 @@
-package org.mesutormanli.customerapi.config.database.dialect;
+package org.mesutormanli.customerapi.config.persistence.dialect;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -6,11 +6,11 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class SQLiteDialectTest {
-    private static String CONSTRAINT_NAME = "constraint";
-    private static String[] FOREIGN_KEY = {"FK"};
-    private static String REFERANCED_TABLE = "rreferancedTable";
-    private static String[] PRIMARY_KEY = {"PK"};
-    private static boolean REFERANCES_PRIMARY_KEY = true;
+    private static final String CONSTRAINT_NAME = "constraint";
+    private static final String[] FOREIGN_KEY = {"FK"};
+    private static final String REFERANCED_TABLE = "rreferancedTable";
+    private static final String[] PRIMARY_KEY = {"PK"};
+    private static final boolean REFERANCES_PRIMARY_KEY = true;
 
 
     private SQLiteDialect sqLiteDialect;

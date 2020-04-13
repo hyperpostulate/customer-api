@@ -8,8 +8,6 @@ import org.mesutormanli.customerapi.service.CustomerService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import static org.mesutormanli.customerapi.controller.CustomerEndpoint.*;
-
 @RestController
 public class CustomerController {
 
@@ -19,32 +17,32 @@ public class CustomerController {
         this.customerService = customerService;
     }
 
-    @GetMapping(CUSTOMER_URL_WITH_ID)
-    public ResponseEntity<CustomerListResponse> getCustomer(@PathVariable(ID) Long id) {
+    @GetMapping("/customer/{id}")
+    public ResponseEntity<CustomerListResponse> getCustomer(@PathVariable("id") Long id) {
         return customerService.getCustomer(id);
     }
 
-    @GetMapping(CUSTOMER_BASE_URL)
+    @GetMapping("/customer")
     public ResponseEntity<CustomerListResponse> getAllCustomers() {
         return customerService.getAllCustomers();
     }
 
-    @PostMapping(CUSTOMER_BASE_URL)
+    @PostMapping("/customer")
     public ResponseEntity<CustomerDto> createCustomer(@RequestBody CustomerRequest request) {
         return customerService.createCustomer(request);
     }
 
-    @PutMapping(CUSTOMER_URL_WITH_ID)
-    public ResponseEntity<CustomerDto> updateCustomer(@PathVariable(ID) Long id, @RequestBody CustomerRequest request) {
+    @PutMapping("/customer/{id}")
+    public ResponseEntity<CustomerDto> updateCustomer(@PathVariable("id") Long id, @RequestBody CustomerRequest request) {
         return customerService.updateCustomer(id, request);
     }
 
-    @DeleteMapping(CUSTOMER_URL_WITH_ID)
-    public ResponseEntity<CustomerDeleteResponse> deleteCustomer(@PathVariable(ID) Long id) {
+    @DeleteMapping("/customer/{id}")
+    public ResponseEntity<CustomerDeleteResponse> deleteCustomer(@PathVariable("id") Long id) {
         return customerService.deleteCustomer(id);
     }
 
-    @DeleteMapping(CUSTOMER_BASE_URL)
+    @DeleteMapping("/customer")
     public ResponseEntity<CustomerDeleteResponse> deleteAllCustomers() {
         return customerService.deleteAllCustomers();
     }
