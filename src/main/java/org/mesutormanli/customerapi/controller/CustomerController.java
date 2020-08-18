@@ -22,7 +22,7 @@ public class CustomerController {
         return customerService.getCustomer(id);
     }
 
-    @GetMapping("/customer")
+    @GetMapping("/customers")
     public ResponseEntity<CustomerListResponse> getAllCustomers() {
         return customerService.getAllCustomers();
     }
@@ -42,7 +42,7 @@ public class CustomerController {
         return customerService.deleteCustomer(id);
     }
 
-    @DeleteMapping("/customer")
+    @DeleteMapping("/customers")
     public ResponseEntity<CustomerDeleteResponse> deleteAllCustomers() {
         return customerService.deleteAllCustomers();
     }
