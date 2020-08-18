@@ -60,7 +60,7 @@ class CustomerControllerTest extends BaseControllerTest {
     void getAllCustomers() {
         when(customerService.getAllCustomers()).thenReturn(customerListResponse);
         try {
-            mockMvc.perform(get("/customer"))
+            mockMvc.perform(get("/customers"))
                     .andDo(print())
                     .andExpect(status().isOk());
         } catch (Exception e) {
@@ -127,7 +127,7 @@ class CustomerControllerTest extends BaseControllerTest {
     void deleteAllCustomers() {
         when(customerService.deleteAllCustomers()).thenReturn(customerDeleteResponse);
         try {
-            mockMvc.perform(delete("/customer"))
+            mockMvc.perform(delete("/customers"))
                     .andDo(print())
                     .andExpect(status().isOk());
         } catch (Exception e) {
