@@ -60,17 +60,17 @@ class CustomerServiceTest extends BaseServiceTest {
 
     @Test
     void getAllCustomers_success() {
-        when(repository.findAll()).thenReturn(Collections.emptyList());
-        final ResponseEntity<CustomerListResponse> response = customerService.getAllCustomers();
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-    }
-
-    @Test
-    void getAllCustomers_notFound() {
         when(repository.findAll()).thenReturn(Collections.singletonList(customerEntity));
         final ResponseEntity<CustomerListResponse> response = customerService.getAllCustomers();
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(customerListResponse, response.getBody());
+    }
+
+    @Test
+    void getAllCustomers_notFound() {
+        when(repository.findAll()).thenReturn(Collections.emptyList());
+        final ResponseEntity<CustomerListResponse> response = customerService.getAllCustomers();
+        assertEquals(HttpStatus.OK, response.getStatusCode());
     }
 
     @Test

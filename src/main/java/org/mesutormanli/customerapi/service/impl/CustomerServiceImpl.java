@@ -40,9 +40,6 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public ResponseEntity<CustomerListResponse> getAllCustomers() {
         final List<CustomerEntity> entities = repository.findAll();
-        if (CollectionUtils.isEmpty(entities)) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
 
         final List<CustomerDto> converted = entities
                 .stream()
