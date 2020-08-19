@@ -8,10 +8,7 @@ import org.mesutormanli.customerapi.model.response.CustomerDeleteResponse;
 import org.mesutormanli.customerapi.model.response.CustomerListResponse;
 import org.mesutormanli.customerapi.repository.CustomerRepository;
 import org.mesutormanli.customerapi.service.CustomerService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 import java.util.Collections;
 import java.util.List;
@@ -31,14 +28,16 @@ public class CustomerServiceImpl implements CustomerService {
 
 
     @Override
-    public ResponseEntity<CustomerListResponse> getCustomer(Long id) {
+    public CustomerListResponse getCustomer(Long id) {
+        final CustomerListResponse response = new CustomerListResponse();
         return repository.findById(id)
-                .map(entity -> new ResponseEntity<>(new CustomerListResponse().customers(Collections.singletonList(customerConverter.toDto(entity))), HttpStatus.OK))
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+                .map(entity -> response.customers(Collections.singletonList(customerConverter.toDto(entity))))
+                .orElse(response);
     }
 
     @Override
-    public ResponseEntity<CustomerListResponse> getAllCustomers() {
+    public CustomerListResponse getAllCustomers() {
+        final CustomerListResponse response = new CustomerListResponse();
         final List<CustomerEntity> entities = repository.findAll();
 
         final List<CustomerDto> converted = entities
@@ -46,49 +45,51 @@ public class CustomerServiceImpl implements CustomerService {
                 .map(customerConverter::toDto)
                 .collect(Collectors.toList());
 
-        return new ResponseEntity<>(new CustomerListResponse().customers(converted), HttpStatus.OK);
+        return response.customers(converted);
 
     }
 
     @Override
-    public ResponseEntity<CustomerDto> createCustomer(CustomerRequest request) {
+    public CustomerDto createCustomer(CustomerRequest request) {
         final CustomerEntity saved = repository.save(customerConverter.toEntity(request));
-        return new ResponseEntity<>(customerConverter.toDto(saved), HttpStatus.CREATED);
+        return customerConverter.toDto(saved);
     }
 
     @Override
-    public ResponseEntity<CustomerDto> updateCustomer(Long id, CustomerRequest request) {
+    public CustomerDto updateCustomer(Long id, CustomerRequest request) {
         final Optional<CustomerEntity> optionalCustomerEntity = repository.findById(id);
         if (!optionalCustomerEntity.isPresent()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return null;
         } else {
             final CustomerEntity toBeUpdated = optionalCustomerEntity.get()
                     .name(request.getName())
                     .age(request.getAge());
             final CustomerEntity saved = repository.save(toBeUpdated);
-            return new ResponseEntity<>(customerConverter.toDto(saved), HttpStatus.OK);
+            return customerConverter.toDto(saved);
         }
 
     }
 
     @Override
-    public ResponseEntity<CustomerDeleteResponse> deleteCustomer(Long id) {
+    public CustomerDeleteResponse deleteCustomer(Long id) {
+        final CustomerDeleteResponse response = new CustomerDeleteResponse();
         if (!repository.existsById(id)) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            return response.deletedCustomerCount(0L);
         } else {
             repository.deleteById(id);
-            return new ResponseEntity<>(new CustomerDeleteResponse().deletedCustomerCount((long) 1), HttpStatus.OK);
+            return response.deletedCustomerCount(1L);
         }
     }
 
     @Override
-    public ResponseEntity<CustomerDeleteResponse> deleteAllCustomers() {
+    public CustomerDeleteResponse deleteAllCustomers() {
+        final CustomerDeleteResponse response = new CustomerDeleteResponse();
         final long count = repository.count();
         if (count == 0) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            return response.deletedCustomerCount(0L);
         } else {
             repository.deleteAll();
-            return new ResponseEntity<>(new CustomerDeleteResponse().deletedCustomerCount(count), HttpStatus.OK);
+            return response.deletedCustomerCount(count);
         }
     }
 

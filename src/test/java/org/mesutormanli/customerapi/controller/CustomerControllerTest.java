@@ -10,7 +10,6 @@ import org.mesutormanli.customerapi.model.response.CustomerListResponse;
 import org.mesutormanli.customerapi.service.CustomerService;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.ResponseEntity;
 
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mesutormanli.customerapi.builder.CustomerMockDataBuilder.*;
@@ -23,10 +22,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class CustomerControllerTest extends BaseControllerTest {
 
     private static final long CUSTOMER_ID = 1;
-    private ResponseEntity<CustomerListResponse> customerListResponse;
+    private CustomerListResponse customerListResponse;
     private CustomerRequest customerRequest;
-    private ResponseEntity<CustomerDto> customerResponse;
-    private ResponseEntity<CustomerDeleteResponse> customerDeleteResponse;
+    private CustomerDto customerDto;
+    private CustomerDeleteResponse customerDeleteResponse;
 
     @MockBean
     private CustomerService customerService;
@@ -35,7 +34,7 @@ class CustomerControllerTest extends BaseControllerTest {
     void setUp() {
         customerListResponse = generateCustomerListResponse(CUSTOMER_ID);
         customerRequest = generateCustomerRequest();
-        customerResponse = generateCustomerResponse(CUSTOMER_ID);
+        customerDto = generateCustomerDto(CUSTOMER_ID);
         customerDeleteResponse = generateCustomerDeleteResponse();
     }
 
@@ -47,6 +46,21 @@ class CustomerControllerTest extends BaseControllerTest {
             mockMvc.perform(get("/customer/{id}", CUSTOMER_ID))
                     .andDo(print())
                     .andExpect(status().isOk());
+        } catch (Exception e) {
+            fail(e);
+        }
+
+        verify(customerService, times(1)).getCustomer(CUSTOMER_ID);
+        verifyNoMoreInteractions(customerService);
+    }
+
+    @Test
+    void getCustomer_notFound() {
+        when(customerService.getCustomer(CUSTOMER_ID)).thenReturn(new CustomerListResponse());
+        try {
+            mockMvc.perform(get("/customer/{id}", CUSTOMER_ID))
+                    .andDo(print())
+                    .andExpect(status().isNotFound());
         } catch (Exception e) {
             fail(e);
         }
@@ -73,7 +87,7 @@ class CustomerControllerTest extends BaseControllerTest {
 
     @Test
     void createCustomer() {
-        when(customerService.createCustomer(customerRequest)).thenReturn(customerResponse);
+        when(customerService.createCustomer(customerRequest)).thenReturn(customerDto);
 
         try {
             mockMvc.perform(post("/customer")
@@ -81,7 +95,7 @@ class CustomerControllerTest extends BaseControllerTest {
                     .content(json(customerRequest))
             )
                     .andDo(print())
-                    .andExpect(status().isOk());
+                    .andExpect(status().isCreated());
         } catch (Exception e) {
             fail(e);
         }
@@ -92,7 +106,7 @@ class CustomerControllerTest extends BaseControllerTest {
 
     @Test
     void updateCustomer() {
-        when(customerService.updateCustomer(CUSTOMER_ID, customerRequest)).thenReturn(customerResponse);
+        when(customerService.updateCustomer(CUSTOMER_ID, customerRequest)).thenReturn(customerDto);
         try {
             mockMvc.perform(put("/customer/{id}", CUSTOMER_ID)
                     .contentType(contentType)
@@ -100,6 +114,24 @@ class CustomerControllerTest extends BaseControllerTest {
             )
                     .andDo(print())
                     .andExpect(status().isOk());
+        } catch (Exception e) {
+            fail(e);
+        }
+
+        verify(customerService, times(1)).updateCustomer(CUSTOMER_ID, customerRequest);
+        verifyNoMoreInteractions(customerService);
+    }
+
+    @Test
+    void updateCustomer_notFound() {
+        when(customerService.updateCustomer(CUSTOMER_ID, customerRequest)).thenReturn(null);
+        try {
+            mockMvc.perform(put("/customer/{id}", CUSTOMER_ID)
+                    .contentType(contentType)
+                    .content(json(customerRequest))
+            )
+                    .andDo(print())
+                    .andExpect(status().isNotFound());
         } catch (Exception e) {
             fail(e);
         }
@@ -124,12 +156,42 @@ class CustomerControllerTest extends BaseControllerTest {
     }
 
     @Test
+    void deleteCustomer_noContent() {
+        when(customerService.deleteCustomer(CUSTOMER_ID)).thenReturn(new CustomerDeleteResponse().deletedCustomerCount(0L));
+        try {
+            mockMvc.perform(delete("/customer/{id}", CUSTOMER_ID))
+                    .andDo(print())
+                    .andExpect(status().isNoContent());
+        } catch (Exception e) {
+            fail(e);
+        }
+
+        verify(customerService, times(1)).deleteCustomer(CUSTOMER_ID);
+        verifyNoMoreInteractions(customerService);
+    }
+
+    @Test
     void deleteAllCustomers() {
         when(customerService.deleteAllCustomers()).thenReturn(customerDeleteResponse);
         try {
             mockMvc.perform(delete("/customers"))
                     .andDo(print())
                     .andExpect(status().isOk());
+        } catch (Exception e) {
+            fail(e);
+        }
+
+        verify(customerService, times(1)).deleteAllCustomers();
+        verifyNoMoreInteractions(customerService);
+    }
+
+    @Test
+    void deleteAllCustomers_noContent() {
+        when(customerService.deleteAllCustomers()).thenReturn(new CustomerDeleteResponse().deletedCustomerCount(0L));
+        try {
+            mockMvc.perform(delete("/customers"))
+                    .andDo(print())
+                    .andExpect(status().isNoContent());
         } catch (Exception e) {
             fail(e);
         }
