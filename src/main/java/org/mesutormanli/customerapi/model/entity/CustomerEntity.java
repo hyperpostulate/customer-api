@@ -1,11 +1,16 @@
 package org.mesutormanli.customerapi.model.entity;
 
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
+
 import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
 @Table(name = "CUSTOMER")
+@SQLDelete(sql = "UPDATE CUSTOMER SET deleted = true WHERE id=?")
+@Where(clause = "deleted=false")
 public class CustomerEntity {
 
     @Id
@@ -35,6 +40,9 @@ public class CustomerEntity {
 
     @Column
     private String maritalStatus;
+
+    @Column
+    private boolean deleted = Boolean.FALSE;
 
     public Long getId() {
         return id;
@@ -117,25 +125,25 @@ public class CustomerEntity {
         return this;
     }
 
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         CustomerEntity that = (CustomerEntity) o;
-        return Objects.equals(id, that.id) &&
-                Objects.equals(name, that.name) &&
-                Objects.equals(surname, that.surname) &&
-                Objects.equals(age, that.age) &&
-                Objects.equals(address, that.address) &&
-                Objects.equals(telephone, that.telephone) &&
-                Objects.equals(email, that.email) &&
-                Objects.equals(nationality, that.nationality) &&
-                Objects.equals(maritalStatus, that.maritalStatus);
+        return deleted == that.deleted && Objects.equals(id, that.id) && Objects.equals(name, that.name) && Objects.equals(surname, that.surname) && Objects.equals(age, that.age) && Objects.equals(address, that.address) && Objects.equals(telephone, that.telephone) && Objects.equals(email, that.email) && Objects.equals(nationality, that.nationality) && Objects.equals(maritalStatus, that.maritalStatus);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, surname, age, address, telephone, email, nationality, maritalStatus);
+        return Objects.hash(id, name, surname, age, address, telephone, email, nationality, maritalStatus, deleted);
     }
 
     @Override
@@ -150,6 +158,7 @@ public class CustomerEntity {
                 ", email='" + email + '\'' +
                 ", nationality='" + nationality + '\'' +
                 ", maritalStatus='" + maritalStatus + '\'' +
+                ", deleted=" + deleted +
                 '}';
     }
 }
