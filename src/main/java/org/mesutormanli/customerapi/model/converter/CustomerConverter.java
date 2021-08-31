@@ -11,7 +11,7 @@ public class CustomerConverter {
         if (entity == null) {
             return null;
         } else {
-            return new CustomerDto()
+            return CustomerDto.builder()
                     .id(entity.getId())
                     .name(entity.getName())
                     .surname(entity.getSurname())
@@ -20,7 +20,8 @@ public class CustomerConverter {
                     .telephone(entity.getTelephone())
                     .email(entity.getEmail())
                     .nationality(entity.getNationality())
-                    .maritalStatus(entity.getMaritalStatus());
+                    .maritalStatus(entity.getMaritalStatus())
+                    .build();
         }
     }
 
@@ -28,7 +29,7 @@ public class CustomerConverter {
         if (request == null) {
             return null;
         } else {
-            return new CustomerEntity()
+            return CustomerEntity.builder()
                     .name(request.getName())
                     .surname(request.getSurname())
                     .age(request.getAge())
@@ -36,7 +37,8 @@ public class CustomerConverter {
                     .telephone(request.getTelephone())
                     .email(request.getEmail())
                     .nationality(request.getNationality())
-                    .maritalStatus(request.getMaritalStatus());
+                    .maritalStatus(request.getMaritalStatus())
+                    .build();
         }
     }
 

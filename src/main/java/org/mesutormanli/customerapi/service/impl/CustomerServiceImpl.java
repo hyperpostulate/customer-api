@@ -31,13 +31,12 @@ public class CustomerServiceImpl implements CustomerService {
     public CustomerListResponse getCustomer(Long id) {
         final CustomerListResponse response = new CustomerListResponse();
         return repository.findById(id)
-                .map(entity -> response.customers(Collections.singletonList(customerConverter.toDto(entity))))
+                .map(entity -> CustomerListResponse.builder().customers(Collections.singletonList(customerConverter.toDto(entity))).build())
                 .orElse(response);
     }
 
     @Override
     public CustomerListResponse getAllCustomers() {
-        final CustomerListResponse response = new CustomerListResponse();
         final List<CustomerEntity> entities = repository.findAll();
 
         final List<CustomerDto> converted = entities
@@ -45,7 +44,7 @@ public class CustomerServiceImpl implements CustomerService {
                 .map(customerConverter::toDto)
                 .collect(Collectors.toList());
 
-        return response.customers(converted);
+        return CustomerListResponse.builder().customers(converted).build();
 
     }
 
@@ -61,9 +60,8 @@ public class CustomerServiceImpl implements CustomerService {
         if (!optionalCustomerEntity.isPresent()) {
             return null;
         } else {
-            final CustomerEntity toBeUpdated = optionalCustomerEntity.get()
-                    .name(request.getName())
-                    .age(request.getAge());
+            final CustomerEntity toBeUpdated = customerConverter.toEntity(request);
+            toBeUpdated.setId(optionalCustomerEntity.get().getId());
             final CustomerEntity saved = repository.save(toBeUpdated);
             return customerConverter.toDto(saved);
         }
@@ -72,24 +70,22 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public CustomerDeleteResponse deleteCustomer(Long id) {
-        final CustomerDeleteResponse response = new CustomerDeleteResponse();
         if (!repository.existsById(id)) {
-            return response.deletedCustomerCount(0L);
+            return CustomerDeleteResponse.builder().deletedCustomerCount(0L).build();
         } else {
             repository.deleteById(id);
-            return response.deletedCustomerCount(1L);
+            return CustomerDeleteResponse.builder().deletedCustomerCount(1L).build();
         }
     }
 
     @Override
     public CustomerDeleteResponse deleteAllCustomers() {
-        final CustomerDeleteResponse response = new CustomerDeleteResponse();
         final long count = repository.count();
         if (count == 0) {
-            return response.deletedCustomerCount(0L);
+            return CustomerDeleteResponse.builder().deletedCustomerCount(0L).build();
         } else {
             repository.deleteAll();
-            return response.deletedCustomerCount(count);
+            return CustomerDeleteResponse.builder().deletedCustomerCount(count).build();
         }
     }
 

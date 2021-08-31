@@ -10,12 +10,10 @@ import org.mesutormanli.customerapi.model.response.CustomerListResponse;
 import org.mesutormanli.customerapi.service.CustomerService;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.test.context.support.WithMockUser;
 
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mesutormanli.customerapi.builder.CustomerMockDataBuilder.*;
 import static org.mockito.Mockito.*;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -164,7 +162,7 @@ class CustomerControllerTest extends BaseControllerTest {
 
     @Test
     void deleteCustomer_noContent() {
-        when(customerService.deleteCustomer(CUSTOMER_ID)).thenReturn(new CustomerDeleteResponse().deletedCustomerCount(0L));
+        when(customerService.deleteCustomer(CUSTOMER_ID)).thenReturn(CustomerDeleteResponse.builder().deletedCustomerCount(0L).build());
         try {
             mockMvc.perform(delete("/customer/{id}", CUSTOMER_ID).with(httpBasic("admin", "admin")))
                     .andDo(print())
@@ -194,7 +192,7 @@ class CustomerControllerTest extends BaseControllerTest {
 
     @Test
     void deleteAllCustomers_noContent() {
-        when(customerService.deleteAllCustomers()).thenReturn(new CustomerDeleteResponse().deletedCustomerCount(0L));
+        when(customerService.deleteAllCustomers()).thenReturn(CustomerDeleteResponse.builder().deletedCustomerCount(0L).build());
         try {
             mockMvc.perform(delete("/customers").with(httpBasic("admin", "admin")))
                     .andDo(print())

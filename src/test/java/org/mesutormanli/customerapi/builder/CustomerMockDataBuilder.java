@@ -13,7 +13,9 @@ public class CustomerMockDataBuilder {
     }
 
     public static CustomerListResponse generateCustomerListResponse(long customerId) {
-        return new CustomerListResponse().customers(Collections.singletonList(generateCustomerDto(customerId)));
+        return CustomerListResponse.builder()
+                .customers(Collections.singletonList(generateCustomerDto(customerId)))
+                .build();
     }
 
     public static CustomerRequest generateCustomerRequest() {
@@ -21,14 +23,17 @@ public class CustomerMockDataBuilder {
     }
 
     public static CustomerDeleteResponse generateCustomerDeleteResponse() {
-        return new CustomerDeleteResponse().deletedCustomerCount((long) 1);
+        return CustomerDeleteResponse.builder()
+                .deletedCustomerCount(1L)
+                .build();
     }
 
     public static CustomerDto generateCustomerDto(long customerId) {
-        return GenericMockDataBuilder.of(CustomerDto.class)
+        final CustomerDto dto = GenericMockDataBuilder.of(CustomerDto.class)
                 .excludeField("id")
-                .build()
-                .id(customerId);
+                .build();
+        dto.setId(customerId);
+        return dto;
     }
 
 }

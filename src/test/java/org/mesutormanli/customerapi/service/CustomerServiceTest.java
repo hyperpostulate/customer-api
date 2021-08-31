@@ -42,9 +42,10 @@ class CustomerServiceTest extends BaseServiceTest {
     void setUp() {
         final CustomerConverter customerConverter = new CustomerConverter();
         customerRequest = generateCustomerRequest();
-        customerEntity = customerConverter.toEntity(customerRequest).id(CUSTOMER_ID);
+        customerEntity = customerConverter.toEntity(customerRequest);
+        customerEntity.setId(CUSTOMER_ID);
         customerDto = customerConverter.toDto(customerEntity);
-        customerListResponse = new CustomerListResponse().customers(Collections.singletonList(customerDto));
+        customerListResponse = CustomerListResponse.builder().customers(Collections.singletonList(customerDto)).build();
         customerService = new CustomerServiceImpl(repository, customerConverter);
     }
 
