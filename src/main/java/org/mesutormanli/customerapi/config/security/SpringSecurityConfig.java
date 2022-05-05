@@ -36,6 +36,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.DELETE, "/customer/**").hasRole("ADMIN")
                 .antMatchers(HttpMethod.DELETE, "/customers").hasRole("ADMIN")
                 .and()
-                .formLogin().disable();
+                .formLogin().disable()
+                .csrf().disable();
     }
 }
