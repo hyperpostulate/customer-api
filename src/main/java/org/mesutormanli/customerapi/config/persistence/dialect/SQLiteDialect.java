@@ -7,12 +7,14 @@ import org.hibernate.dialect.identity.IdentityColumnSupportImpl;
 import java.sql.Types;
 
 public class SQLiteDialect extends Dialect {
+    private static final String INTEGER = "integer";
+    private static final String BLOB = "blob";
 
     public SQLiteDialect() {
-        registerColumnType(Types.BIT, "integer");
+        registerColumnType(Types.BIT, INTEGER);
         registerColumnType(Types.TINYINT, "tinyint");
         registerColumnType(Types.SMALLINT, "smallint");
-        registerColumnType(Types.INTEGER, "integer");
+        registerColumnType(Types.INTEGER, INTEGER);
         registerColumnType(Types.BIGINT, "bigint");
         registerColumnType(Types.FLOAT, "float");
         registerColumnType(Types.REAL, "real");
@@ -25,12 +27,12 @@ public class SQLiteDialect extends Dialect {
         registerColumnType(Types.DATE, "date");
         registerColumnType(Types.TIME, "time");
         registerColumnType(Types.TIMESTAMP, "timestamp");
-        registerColumnType(Types.BINARY, "blob");
-        registerColumnType(Types.VARBINARY, "blob");
-        registerColumnType(Types.LONGVARBINARY, "blob");
-        registerColumnType(Types.BLOB, "blob");
+        registerColumnType(Types.BINARY, BLOB);
+        registerColumnType(Types.VARBINARY, BLOB);
+        registerColumnType(Types.LONGVARBINARY, BLOB);
+        registerColumnType(Types.BLOB, BLOB);
         registerColumnType(Types.CLOB, "clob");
-        registerColumnType(Types.BOOLEAN, "integer");
+        registerColumnType(Types.BOOLEAN, INTEGER);
     }
 
     @Override
@@ -102,7 +104,7 @@ public class SQLiteDialect extends Dialect {
 
         @Override
         public String getIdentityColumnString(int type) {
-            return "integer";
+            return INTEGER;
         }
     }
 }

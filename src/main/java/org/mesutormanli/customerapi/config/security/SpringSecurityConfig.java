@@ -9,14 +9,18 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 @Configuration
 public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
+    private static final String ROLE_USER = "USER";
+    private static final String ROLE_ADMIN = "USER";
+    private static final String URL_PATTERN_CUSTOMER = "/customer/**";
+
     // Create 2 users for demo
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 
         auth.inMemoryAuthentication()
-                .withUser("user").password("{noop}password").roles("USER")
+                .withUser("user").password("{noop}password").roles(ROLE_USER)
                 .and()
-                .withUser("admin").password("{noop}admin").roles("USER", "ADMIN");
+                .withUser("admin").password("{noop}admin").roles(ROLE_USER, ROLE_ADMIN);
 
     }
 
@@ -29,12 +33,12 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .httpBasic()
                 .and()
                 .authorizeRequests()
-                .antMatchers(HttpMethod.GET, "/customer/**").hasRole("USER")
-                .antMatchers(HttpMethod.GET, "/customers").hasRole("USER")
-                .antMatchers(HttpMethod.POST, "/customer").hasRole("ADMIN")
-                .antMatchers(HttpMethod.PUT, "/customer/**").hasRole("ADMIN")
-                .antMatchers(HttpMethod.DELETE, "/customer/**").hasRole("ADMIN")
-                .antMatchers(HttpMethod.DELETE, "/customers").hasRole("ADMIN")
+                .antMatchers(HttpMethod.GET, URL_PATTERN_CUSTOMER).hasRole(ROLE_USER)
+                .antMatchers(HttpMethod.PUT, URL_PATTERN_CUSTOMER).hasRole(ROLE_ADMIN)
+                .antMatchers(HttpMethod.DELETE, URL_PATTERN_CUSTOMER).hasRole(ROLE_ADMIN)
+                .antMatchers(HttpMethod.GET, "/customers").hasRole(ROLE_USER)
+                .antMatchers(HttpMethod.POST, "/customer").hasRole(ROLE_ADMIN)
+                .antMatchers(HttpMethod.DELETE, "/customers").hasRole(ROLE_ADMIN)
                 .and()
                 .formLogin().disable()
                 .csrf().disable();
