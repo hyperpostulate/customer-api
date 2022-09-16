@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.5.3</version>
+        <version>2.5.14</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>org.mesutormanli</groupId>
@@ -16,12 +16,9 @@
 
     <properties>
         <java.version>11</java.version>
-        <springfox.version>3.0.0</springfox.version>
-        <sqlite-jdbc.version>3.39.3.0</sqlite-jdbc.version>
-        <podam.version>7.2.10.RELEASE</podam.version>
-        <gson.version>2.9.1</gson.version>
-        <jakarta.validation-api.version>3.0.2</jakarta.validation-api.version>
         <jjwt-api.version>0.11.5</jjwt-api.version>
+        <springfox.version>3.0.0</springfox.version>
+        <podam.version>7.2.10.RELEASE</podam.version>
     </properties>
 
     <dependencies>
@@ -73,7 +70,6 @@
         <dependency>
             <groupId>org.xerial</groupId>
             <artifactId>sqlite-jdbc</artifactId>
-            <version>${sqlite-jdbc.version}</version>
         </dependency>
         <dependency>
             <groupId>io.springfox</groupId>
@@ -94,7 +90,6 @@
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
-            <version>${gson.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -104,7 +99,6 @@
         <dependency>
             <groupId>jakarta.validation</groupId>
             <artifactId>jakarta.validation-api</artifactId>
-            <version>${jakarta.validation-api.version}</version>
         </dependency>
     </dependencies>
 
