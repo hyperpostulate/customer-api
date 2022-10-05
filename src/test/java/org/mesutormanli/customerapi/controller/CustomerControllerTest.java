@@ -51,8 +51,8 @@ class CustomerControllerTest extends BaseControllerTest {
         when(customerService.getCustomer(CUSTOMER_ID)).thenReturn(customerListResponse);
         try {
             mockMvc.perform(get("/customer/{id}", CUSTOMER_ID)
-                    .with(httpBasic("user", "password"))
-                    .with(csrf()))
+                            .with(httpBasic("user", "password"))
+                            .with(csrf()))
                     .andDo(print())
                     .andExpect(status().isOk());
         } catch (Exception e) {
@@ -68,8 +68,8 @@ class CustomerControllerTest extends BaseControllerTest {
         when(customerService.getCustomer(CUSTOMER_ID)).thenReturn(new CustomerListResponse());
         try {
             mockMvc.perform(get("/customer/{id}", CUSTOMER_ID)
-                    .with(httpBasic("user", "password"))
-                    .with(csrf()))
+                            .with(httpBasic("user", "password"))
+                            .with(csrf()))
                     .andDo(print())
                     .andExpect(status().isNotFound());
         } catch (Exception e) {
@@ -85,8 +85,8 @@ class CustomerControllerTest extends BaseControllerTest {
         when(customerService.getAllCustomers()).thenReturn(customerListResponse);
         try {
             mockMvc.perform(get("/customers")
-                    .with(httpBasic("user", "password"))
-                    .with(csrf()))
+                            .with(httpBasic("user", "password"))
+                            .with(csrf()))
                     .andDo(print())
                     .andExpect(status().isOk());
         } catch (Exception e) {
@@ -103,10 +103,10 @@ class CustomerControllerTest extends BaseControllerTest {
 
         try {
             mockMvc.perform(post("/customer").with(httpBasic("admin", "admin"))
-                    .with(csrf())
-                    .contentType(contentType)
-                    .content(json(customerRequest))
-            )
+                            .with(csrf())
+                            .contentType(contentType)
+                            .content(json(customerRequest))
+                    )
                     .andDo(print())
                     .andExpect(status().isCreated());
         } catch (Exception e) {
@@ -122,11 +122,11 @@ class CustomerControllerTest extends BaseControllerTest {
         when(customerService.updateCustomer(CUSTOMER_ID, customerRequest)).thenReturn(customerDto);
         try {
             mockMvc.perform(put("/customer/{id}", CUSTOMER_ID)
-                    .with(httpBasic("admin", "admin"))
-                    .with(csrf())
-                    .contentType(contentType)
-                    .content(json(customerRequest))
-            )
+                            .with(httpBasic("admin", "admin"))
+                            .with(csrf())
+                            .contentType(contentType)
+                            .content(json(customerRequest))
+                    )
                     .andDo(print())
                     .andExpect(status().isOk());
         } catch (Exception e) {
@@ -142,11 +142,11 @@ class CustomerControllerTest extends BaseControllerTest {
         when(customerService.updateCustomer(CUSTOMER_ID, customerRequest)).thenReturn(null);
         try {
             mockMvc.perform(put("/customer/{id}", CUSTOMER_ID)
-                    .with(httpBasic("admin", "admin"))
-                    .with(csrf())
-                    .contentType(contentType)
-                    .content(json(customerRequest))
-            )
+                            .with(httpBasic("admin", "admin"))
+                            .with(csrf())
+                            .contentType(contentType)
+                            .content(json(customerRequest))
+                    )
                     .andDo(print())
                     .andExpect(status().isNotFound());
         } catch (Exception e) {
@@ -162,8 +162,8 @@ class CustomerControllerTest extends BaseControllerTest {
         when(customerService.deleteCustomer(CUSTOMER_ID)).thenReturn(customerDeleteResponse);
         try {
             mockMvc.perform(delete("/customer/{id}", CUSTOMER_ID)
-                    .with(httpBasic("admin", "admin"))
-                    .with(csrf()))
+                            .with(httpBasic("admin", "admin"))
+                            .with(csrf()))
                     .andDo(print())
                     .andExpect(status().isOk());
         } catch (Exception e) {
@@ -179,8 +179,8 @@ class CustomerControllerTest extends BaseControllerTest {
         when(customerService.deleteCustomer(CUSTOMER_ID)).thenReturn(CustomerDeleteResponse.builder().deletedCustomerCount(0L).build());
         try {
             mockMvc.perform(delete("/customer/{id}", CUSTOMER_ID)
-                    .with(httpBasic("admin", "admin"))
-                    .with(csrf()))
+                            .with(httpBasic("admin", "admin"))
+                            .with(csrf()))
                     .andDo(print())
                     .andExpect(status().isNoContent());
         } catch (Exception e) {
@@ -196,8 +196,8 @@ class CustomerControllerTest extends BaseControllerTest {
         when(customerService.deleteAllCustomers()).thenReturn(customerDeleteResponse);
         try {
             mockMvc.perform(delete("/customers")
-                    .with(httpBasic("admin", "admin"))
-                    .with(csrf()))
+                            .with(httpBasic("admin", "admin"))
+                            .with(csrf()))
                     .andDo(print())
                     .andExpect(status().isOk());
         } catch (Exception e) {
@@ -213,8 +213,8 @@ class CustomerControllerTest extends BaseControllerTest {
         when(customerService.deleteAllCustomers()).thenReturn(CustomerDeleteResponse.builder().deletedCustomerCount(0L).build());
         try {
             mockMvc.perform(delete("/customers")
-                    .with(httpBasic("admin", "admin"))
-                    .with(csrf()))
+                            .with(httpBasic("admin", "admin"))
+                            .with(csrf()))
                     .andDo(print())
                     .andExpect(status().isNoContent());
         } catch (Exception e) {
