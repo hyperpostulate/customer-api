@@ -67,6 +67,9 @@ jobs:
     #   modify them (or add more) to build your code if your project, please refer to the EXAMPLE below for guidance.
 
     - name: Install Dependencies
+      uses: actions/setup-java@v1
+      with:
+        java-version: 17
       run: mvn clean install
 
     - name: Perform CodeQL Analysis
