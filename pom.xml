@@ -15,7 +15,7 @@
     <description>REST Api for a SQLite Database</description>
 
     <properties>
-        <java.version>11</java.version>
+        <java.version>17</java.version>
         <jjwt-api.version>0.11.5</jjwt-api.version>
         <springfox.version>3.0.0</springfox.version>
         <podam.version>7.2.10.RELEASE</podam.version>
