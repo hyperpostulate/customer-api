@@ -1,8 +1,6 @@
 package org.mesutormanli.customerapi.controller;
 
-import org.hibernate.validator.internal.IgnoreForbiddenApisErrors;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mesutormanli.customerapi.base.BaseControllerTest;
 import org.mesutormanli.customerapi.model.dto.CustomerDto;
@@ -17,7 +15,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mesutormanli.customerapi.builder.CustomerMockDataBuilder.*;
 import static org.mockito.Mockito.*;
-import static org.springframework.http.ResponseEntity.status;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
@@ -90,8 +87,8 @@ class CustomerControllerTest extends BaseControllerTest {
 
         try {
             mockMvc.perform(post("/customer")
-                    .contentType(contentType)
-                    .content(json(customerRequest)))
+                            .contentType(contentType)
+                            .content(json(customerRequest)))
                     .andExpect(MockMvcResultMatchers.status().isCreated());
         } catch (Exception e) {
             fail(e);
@@ -106,8 +103,8 @@ class CustomerControllerTest extends BaseControllerTest {
         when(customerService.updateCustomer(CUSTOMER_ID, customerRequest)).thenReturn(customerDto);
         try {
             mockMvc.perform(put("/customer/{id}", CUSTOMER_ID)
-                    .contentType(contentType)
-                    .content(json(customerRequest)))
+                            .contentType(contentType)
+                            .content(json(customerRequest)))
                     .andExpect(MockMvcResultMatchers.status().isOk());
         } catch (Exception e) {
             fail(e);
