@@ -8,17 +8,24 @@ import org.mesutormanli.customerapi.model.request.CustomerRequest;
 import org.mesutormanli.customerapi.model.response.CustomerDeleteResponse;
 import org.mesutormanli.customerapi.model.response.CustomerListResponse;
 import org.mesutormanli.customerapi.service.CustomerService;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.web.context.WebApplicationContext;
 
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mesutormanli.customerapi.builder.CustomerMockDataBuilder.*;
 import static org.mockito.Mockito.*;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 @WebMvcTest(value = CustomerController.class)
+@AutoConfigureRestDocs
 class CustomerControllerTest extends BaseControllerTest {
 
     private static final long CUSTOMER_ID = 1;
@@ -30,13 +37,19 @@ class CustomerControllerTest extends BaseControllerTest {
     @MockBean
     private CustomerService customerService;
 
+
     @BeforeEach
-    void setUp() {
+    void setUp(WebApplicationContext webApplicationContext,
+               RestDocumentationContextProvider restDocumentation) {
         customerListResponse = generateCustomerListResponse(CUSTOMER_ID);
         customerRequest = generateCustomerRequest();
         customerDto = generateCustomerDto(CUSTOMER_ID);
         customerDeleteResponse = generateCustomerDeleteResponse();
-        this.mockMvc = webAppContextSetup(wac)
+
+        this.mockMvc = webAppContextSetup(webApplicationContext)
+                .apply(documentationConfiguration(restDocumentation))
+                .alwaysDo(document("{method-name}",
+                        preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint())))
                 .build();
     }
 
