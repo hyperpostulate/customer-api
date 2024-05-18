@@ -12,14 +12,16 @@ import org.mesutormanli.customerapi.model.response.CustomerListResponse;
 import org.mesutormanli.customerapi.service.CustomerService;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mesutormanli.customerapi.builder.CustomerMockDataBuilder.*;
 import static org.mockito.Mockito.*;
+import static org.springframework.http.ResponseEntity.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 @WebMvcTest(value = CustomerController.class)
-@Disabled
 class CustomerControllerTest extends BaseControllerTest {
 
     private static final long CUSTOMER_ID = 1;
@@ -45,7 +47,8 @@ class CustomerControllerTest extends BaseControllerTest {
     void getCustomer() {
         when(customerService.getCustomer(CUSTOMER_ID)).thenReturn(customerListResponse);
         try {
-            //TODO: mockMvc.perform(get("/customer/{id}", CUSTOMER_ID)
+            mockMvc.perform(get("/customer/{id}", CUSTOMER_ID))
+                    .andExpect(MockMvcResultMatchers.status().isOk());
         } catch (Exception e) {
             fail(e);
         }
@@ -57,7 +60,8 @@ class CustomerControllerTest extends BaseControllerTest {
     void getCustomer_notFound() {
         when(customerService.getCustomer(CUSTOMER_ID)).thenReturn(new CustomerListResponse());
         try {
-            //TODO: mockMvc.perform(get("/customer/{id}", CUSTOMER_ID)
+            mockMvc.perform(get("/customer/{id}", CUSTOMER_ID))
+                    .andExpect(MockMvcResultMatchers.status().isNotFound());
         } catch (Exception e) {
             fail(e);
         }
@@ -70,7 +74,8 @@ class CustomerControllerTest extends BaseControllerTest {
     void getAllCustomers() {
         when(customerService.getAllCustomers()).thenReturn(customerListResponse);
         try {
-            //TODO: mockMvc.perform(get("/customer/{id}", CUSTOMER_ID)
+            mockMvc.perform(get("/customers", CUSTOMER_ID))
+                    .andExpect(MockMvcResultMatchers.status().isOk());
         } catch (Exception e) {
             fail(e);
         }
@@ -84,7 +89,10 @@ class CustomerControllerTest extends BaseControllerTest {
         when(customerService.createCustomer(customerRequest)).thenReturn(customerDto);
 
         try {
-            //TODO: mockMvc.perform(get("/customer/{id}", CUSTOMER_ID)
+            mockMvc.perform(post("/customer")
+                    .contentType(contentType)
+                    .content(json(customerRequest)))
+                    .andExpect(MockMvcResultMatchers.status().isCreated());
         } catch (Exception e) {
             fail(e);
         }
@@ -97,7 +105,10 @@ class CustomerControllerTest extends BaseControllerTest {
     void updateCustomer() {
         when(customerService.updateCustomer(CUSTOMER_ID, customerRequest)).thenReturn(customerDto);
         try {
-            //TODO: mockMvc.perform(get("/customer/{id}", CUSTOMER_ID)
+            mockMvc.perform(put("/customer/{id}", CUSTOMER_ID)
+                    .contentType(contentType)
+                    .content(json(customerRequest)))
+                    .andExpect(MockMvcResultMatchers.status().isOk());
         } catch (Exception e) {
             fail(e);
         }
@@ -110,7 +121,10 @@ class CustomerControllerTest extends BaseControllerTest {
     void updateCustomer_notFound() {
         when(customerService.updateCustomer(CUSTOMER_ID, customerRequest)).thenReturn(null);
         try {
-            //TODO: mockMvc.perform(get("/customer/{id}", CUSTOMER_ID)
+            mockMvc.perform(put("/customer/{id}", CUSTOMER_ID)
+                            .contentType(contentType)
+                            .content(json(customerRequest)))
+                    .andExpect(MockMvcResultMatchers.status().isNotFound());
         } catch (Exception e) {
             fail(e);
         }
@@ -123,7 +137,8 @@ class CustomerControllerTest extends BaseControllerTest {
     void deleteCustomer() {
         when(customerService.deleteCustomer(CUSTOMER_ID)).thenReturn(customerDeleteResponse);
         try {
-            //TODO: mockMvc.perform(get("/customer/{id}", CUSTOMER_ID)
+            mockMvc.perform(delete("/customer/{id}", CUSTOMER_ID))
+                    .andExpect(MockMvcResultMatchers.status().isOk());
         } catch (Exception e) {
             fail(e);
         }
@@ -136,7 +151,8 @@ class CustomerControllerTest extends BaseControllerTest {
     void deleteCustomer_noContent() {
         when(customerService.deleteCustomer(CUSTOMER_ID)).thenReturn(CustomerDeleteResponse.builder().deletedCustomerCount(0L).build());
         try {
-            //TODO: mockMvc.perform(get("/customer/{id}", CUSTOMER_ID)
+            mockMvc.perform(delete("/customer/{id}", CUSTOMER_ID))
+                    .andExpect(MockMvcResultMatchers.status().isNoContent());
         } catch (Exception e) {
             fail(e);
         }
@@ -149,7 +165,8 @@ class CustomerControllerTest extends BaseControllerTest {
     void deleteAllCustomers() {
         when(customerService.deleteAllCustomers()).thenReturn(customerDeleteResponse);
         try {
-            //TODO: mockMvc.perform(get("/customer/{id}", CUSTOMER_ID)
+            mockMvc.perform(delete("/customers"))
+                    .andExpect(MockMvcResultMatchers.status().isOk());
         } catch (Exception e) {
             fail(e);
         }
@@ -162,7 +179,8 @@ class CustomerControllerTest extends BaseControllerTest {
     void deleteAllCustomers_noContent() {
         when(customerService.deleteAllCustomers()).thenReturn(CustomerDeleteResponse.builder().deletedCustomerCount(0L).build());
         try {
-            //TODO: mockMvc.perform(get("/customer/{id}", CUSTOMER_ID)
+            mockMvc.perform(delete("/customers"))
+                    .andExpect(MockMvcResultMatchers.status().isNoContent());
         } catch (Exception e) {
             fail(e);
         }
