@@ -8,7 +8,7 @@ public class GenericMockDataBuilder<T> {
 
     private final Class<T> type;
     private final PodamFactory podamFactory;
-    private AbstractClassInfoStrategy classInfoStrategy;
+    private final AbstractClassInfoStrategy classInfoStrategy;
 
     private GenericMockDataBuilder(Class<T> type) {
         this.type = type;

@@ -57,7 +57,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public CustomerDto updateCustomer(Long id, CustomerRequest request) {
         final Optional<CustomerEntity> optionalCustomerEntity = repository.findById(id);
-        if (!optionalCustomerEntity.isPresent()) {
+        if (optionalCustomerEntity.isEmpty()) {
             return null;
         } else {
             final CustomerEntity toBeUpdated = customerConverter.toEntity(request);
