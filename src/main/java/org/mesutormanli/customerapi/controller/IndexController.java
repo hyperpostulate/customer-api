@@ -9,7 +9,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 @RestController
 @RequestMapping("/")
-public class IndexController {
+public final class IndexController {
 
     @GetMapping
     public CustomerControllerRepresentationModel index() {

@@ -7,6 +7,6 @@ import java.io.Serializable;
 
 @Data
 @Builder
-public class CustomerDeleteResponse implements Serializable {
+public final class CustomerDeleteResponse implements Serializable {
     private Long deletedCustomerCount;
 }

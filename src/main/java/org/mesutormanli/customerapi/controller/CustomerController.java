@@ -11,7 +11,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-public class CustomerController {
+public final class CustomerController {
 
     private final CustomerService customerService;
 

@@ -7,7 +7,7 @@ import java.io.Serializable;
 
 @Data
 @Builder
-public class CustomerRequest implements Serializable {
+public final class CustomerRequest implements Serializable {
     private String name;
     private String surname;
     private Integer age;
