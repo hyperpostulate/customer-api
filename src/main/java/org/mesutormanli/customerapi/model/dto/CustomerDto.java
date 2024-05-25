@@ -11,7 +11,7 @@ import java.io.Serializable;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CustomerDto implements Serializable {
+public final class CustomerDto implements Serializable {
     private Long id;
     private String name;
     private String surname;

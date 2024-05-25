@@ -6,7 +6,7 @@ import org.mesutormanli.customerapi.model.request.CustomerRequest;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CustomerConverter {
+public final class CustomerConverter {
     public CustomerDto toDto(CustomerEntity entity) {
         if (entity == null) {
             return null;

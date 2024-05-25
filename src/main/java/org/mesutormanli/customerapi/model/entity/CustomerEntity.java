@@ -17,7 +17,7 @@ import org.hibernate.annotations.SQLRestriction;
 @Table(name = "CUSTOMER")
 @SQLDelete(sql = "UPDATE CUSTOMER SET deleted = true WHERE id=?")
 @SQLRestriction("status <> 'DELETED'")
-public class CustomerEntity {
+public final class CustomerEntity {
 
     @Id
     @GeneratedValue

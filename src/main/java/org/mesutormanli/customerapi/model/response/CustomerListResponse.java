@@ -13,6 +13,6 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CustomerListResponse implements Serializable {
+public final class CustomerListResponse implements Serializable {
     private List<CustomerDto> customers;
 }
