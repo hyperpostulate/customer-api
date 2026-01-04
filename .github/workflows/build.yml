@@ -27,6 +27,7 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
           cache: maven
+          path: customer-api
       - name: Build with Maven
         run: mvn -B package --file pom.xml
 
