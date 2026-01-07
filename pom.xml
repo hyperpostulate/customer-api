@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.5</version>
+        <version>3.4.0</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>org.mesutormanli</groupId>
@@ -16,9 +16,9 @@
     <properties>
         <java.version>21</java.version>
         <podam.version>7.2.11.RELEASE</podam.version>
-        <gson.version>2.10.1</gson.version>
-        <sqlite-jdbc.version>3.41.2.2</sqlite-jdbc.version>
-        <asciidoctor-maven-plugin.version>2.2.1</asciidoctor-maven-plugin.version>
+        <gson.version>2.11.0</gson.version>
+        <sqlite-jdbc.version>3.46.0.0</sqlite-jdbc.version>
+        <asciidoctor-maven-plugin.version>2.2.4</asciidoctor-maven-plugin.version>
     </properties>
     <dependencies>
         <dependency>
