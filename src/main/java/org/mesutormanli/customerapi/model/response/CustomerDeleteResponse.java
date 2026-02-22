@@ -1,10 +1,30 @@
 package org.mesutormanli.customerapi.model.response;
 
-import lombok.Builder;
-
 import java.io.Serializable;
 
-@Builder
-public record CustomerDeleteResponse(
-        Long deletedCustomerCount) implements Serializable {
+public record CustomerDeleteResponse(Long deletedCustomerCount) implements Serializable {
+
+    public CustomerDeleteResponse() {
+        this(null);
+    }
+
+    public static CustomerDeleteResponseBuilder builder() {
+        return new CustomerDeleteResponseBuilder();
+    }
+
+    public static class CustomerDeleteResponseBuilder {
+        private Long deletedCustomerCount;
+
+        CustomerDeleteResponseBuilder() {
+        }
+
+        public CustomerDeleteResponseBuilder deletedCustomerCount(Long deletedCustomerCount) {
+            this.deletedCustomerCount = deletedCustomerCount;
+            return this;
+        }
+
+        public CustomerDeleteResponse build() {
+            return new CustomerDeleteResponse(deletedCustomerCount);
+        }
+    }
 }
