@@ -37,10 +37,9 @@ class CustomerControllerTest extends BaseControllerTest {
     @MockBean
     private CustomerService customerService;
 
-
     @BeforeEach
     void setUp(WebApplicationContext webApplicationContext,
-               RestDocumentationContextProvider restDocumentation) {
+            RestDocumentationContextProvider restDocumentation) {
         customerListResponse = generateCustomerListResponse(CUSTOMER_ID);
         customerRequest = generateCustomerRequest();
         customerDto = generateCustomerDto(CUSTOMER_ID);
@@ -68,7 +67,7 @@ class CustomerControllerTest extends BaseControllerTest {
 
     @Test
     void getCustomer_notFound() {
-        when(customerService.getCustomer(CUSTOMER_ID)).thenReturn(new CustomerListResponse());
+        when(customerService.getCustomer(CUSTOMER_ID)).thenReturn(CustomerListResponse.builder().build());
         try {
             mockMvc.perform(get("/customer/{id}", CUSTOMER_ID))
                     .andExpect(MockMvcResultMatchers.status().isNotFound());
@@ -199,7 +198,3 @@ class CustomerControllerTest extends BaseControllerTest {
         verifyNoMoreInteractions(customerService);
     }
 }
-
-
-
-
