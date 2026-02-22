@@ -30,14 +30,14 @@ public final class CustomerConverter {
             return null;
         } else {
             return CustomerEntity.builder()
-                    .name(request.getName())
-                    .surname(request.getSurname())
-                    .age(request.getAge())
-                    .address(request.getAddress())
-                    .telephone(request.getTelephone())
-                    .email(request.getEmail())
-                    .nationality(request.getNationality())
-                    .maritalStatus(request.getMaritalStatus())
+                    .name(request.name())
+                    .surname(request.surname())
+                    .age(request.age())
+                    .address(request.address())
+                    .telephone(request.telephone())
+                    .email(request.email())
+                    .nationality(request.nationality())
+                    .maritalStatus(request.maritalStatus())
                     .build();
         }
     }

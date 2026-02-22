@@ -23,7 +23,7 @@ public final class CustomerController {
     public ResponseEntity<CustomerListResponse> getCustomer(@PathVariable("id") Long id) {
         CustomerListResponse response = customerService.getCustomer(id);
 
-        if (CollectionUtils.isEmpty(response.getCustomers())) {
+        if (CollectionUtils.isEmpty(response.customers())) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else {
             return new ResponseEntity<>(response, HttpStatus.OK);
@@ -43,7 +43,8 @@ public final class CustomerController {
     }
 
     @PutMapping("/customer/{id}")
-    public ResponseEntity<CustomerDto> updateCustomer(@PathVariable("id") Long id, @RequestBody CustomerRequest request) {
+    public ResponseEntity<CustomerDto> updateCustomer(@PathVariable("id") Long id,
+            @RequestBody CustomerRequest request) {
         CustomerDto customerDto = customerService.updateCustomer(id, request);
         if (null == customerDto) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -55,7 +56,7 @@ public final class CustomerController {
     @DeleteMapping("/customer/{id}")
     public ResponseEntity<CustomerDeleteResponse> deleteCustomer(@PathVariable("id") Long id) {
         CustomerDeleteResponse response = customerService.deleteCustomer(id);
-        if (0L == response.getDeletedCustomerCount()) {
+        if (0L == response.deletedCustomerCount()) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } else {
             return new ResponseEntity<>(response, HttpStatus.OK);
@@ -65,7 +66,7 @@ public final class CustomerController {
     @DeleteMapping("/customers")
     public ResponseEntity<CustomerDeleteResponse> deleteAllCustomers() {
         CustomerDeleteResponse response = customerService.deleteAllCustomers();
-        if (0L == response.getDeletedCustomerCount()) {
+        if (0L == response.deletedCustomerCount()) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } else {
             return new ResponseEntity<>(response, HttpStatus.OK);

@@ -1,19 +1,17 @@
 package org.mesutormanli.customerapi.model.request;
 
 import lombok.Builder;
-import lombok.Data;
 
 import java.io.Serializable;
 
-@Data
 @Builder
-public final class CustomerRequest implements Serializable {
-    private String name;
-    private String surname;
-    private Integer age;
-    private String address;
-    private String telephone;
-    private String email;
-    private String nationality;
-    private String maritalStatus;
+public record CustomerRequest(
+        String name,
+        String surname,
+        Integer age,
+        String address,
+        String telephone,
+        String email,
+        String nationality,
+        String maritalStatus) implements Serializable {
 }
