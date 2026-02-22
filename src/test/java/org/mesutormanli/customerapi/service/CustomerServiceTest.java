@@ -23,7 +23,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
-
 class CustomerServiceTest extends BaseServiceTest {
 
     private static final long CUSTOMER_ID = 1;
@@ -36,7 +35,6 @@ class CustomerServiceTest extends BaseServiceTest {
     private CustomerRepository repository;
 
     private CustomerService customerService;
-
 
     @BeforeEach
     void setUp() {
@@ -67,7 +65,7 @@ class CustomerServiceTest extends BaseServiceTest {
     void getAllCustomers_notFound() {
         when(repository.findAll()).thenReturn(Collections.emptyList());
         final CustomerListResponse response = customerService.getAllCustomers();
-        assertTrue(CollectionUtils.isEmpty(response.getCustomers()));
+        assertTrue(CollectionUtils.isEmpty(response.customers()));
     }
 
     @Test
@@ -98,14 +96,14 @@ class CustomerServiceTest extends BaseServiceTest {
         doNothing().when(repository).deleteById(CUSTOMER_ID);
         final CustomerDeleteResponse response = customerService.deleteCustomer(CUSTOMER_ID);
         assertNotNull(response);
-        assertEquals(1, response.getDeletedCustomerCount());
+        assertEquals(1, response.deletedCustomerCount());
     }
 
     @Test
     void deleteCustomer_noContent() {
         when(repository.existsById(CUSTOMER_ID)).thenReturn(false);
         final CustomerDeleteResponse response = customerService.deleteCustomer(CUSTOMER_ID);
-        assertEquals(0, response.getDeletedCustomerCount());
+        assertEquals(0, response.deletedCustomerCount());
     }
 
     @Test
@@ -114,14 +112,14 @@ class CustomerServiceTest extends BaseServiceTest {
         doNothing().when(repository).deleteAll();
         final CustomerDeleteResponse response = customerService.deleteAllCustomers();
         assertNotNull(response);
-        assertEquals(1, response.getDeletedCustomerCount());
+        assertEquals(1, response.deletedCustomerCount());
     }
 
     @Test
     void deleteAllCustomers_noContent() {
         when(repository.count()).thenReturn((long) 0);
         final CustomerDeleteResponse response = customerService.deleteAllCustomers();
-        assertEquals(0, response.getDeletedCustomerCount());
+        assertEquals(0, response.deletedCustomerCount());
     }
 
 }

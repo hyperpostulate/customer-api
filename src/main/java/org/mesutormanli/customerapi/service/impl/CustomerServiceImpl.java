@@ -26,23 +26,23 @@ public class CustomerServiceImpl implements CustomerService {
         this.customerConverter = customerConverter;
     }
 
-
     @Override
     public CustomerListResponse getCustomer(Long id) {
-        final CustomerListResponse response = new CustomerListResponse();
+        final CustomerListResponse response = CustomerListResponse.builder().build();
         return repository.findById(id)
-                .map(entity -> CustomerListResponse.builder().customers(Collections.singletonList(customerConverter.toDto(entity))).build())
+                .map(entity -> CustomerListResponse.builder()
+                        .customers(Collections.singletonList(customerConverter.toDto(entity))).build())
                 .orElse(response);
     }
 
     @Override
     public CustomerListResponse getAllCustomers() {
-        final List<CustomerEntity> entities = repository.findAll();
+        var entities = repository.findAll();
 
-        final List<CustomerDto> converted = entities
+        var converted = entities
                 .stream()
                 .map(customerConverter::toDto)
-                .collect(Collectors.toList());
+                .toList();
 
         return CustomerListResponse.builder().customers(converted).build();
 
@@ -56,12 +56,12 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public CustomerDto updateCustomer(Long id, CustomerRequest request) {
-        final Optional<CustomerEntity> optionalCustomerEntity = repository.findById(id);
-        if (optionalCustomerEntity.isEmpty()) {
+        var optionalCustomer = repository.findById(id);
+        if (optionalCustomer.isEmpty()) {
             return null;
         } else {
             final CustomerEntity toBeUpdated = customerConverter.toEntity(request);
-            toBeUpdated.setId(optionalCustomerEntity.get().getId());
+            toBeUpdated.setId(optionalCustomer.get().getId());
             final CustomerEntity saved = repository.save(toBeUpdated);
             return customerConverter.toDto(saved);
         }
@@ -90,4 +90,3 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
 }
-

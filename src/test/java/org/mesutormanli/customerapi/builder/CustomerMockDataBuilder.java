@@ -32,8 +32,17 @@ public class CustomerMockDataBuilder {
         final CustomerDto dto = GenericMockDataBuilder.of(CustomerDto.class)
                 .excludeField("id")
                 .build();
-        dto.setId(customerId);
-        return dto;
+        return CustomerDto.builder()
+                .id(customerId)
+                .name(dto.name())
+                .surname(dto.surname())
+                .age(dto.age())
+                .address(dto.address())
+                .telephone(dto.telephone())
+                .email(dto.email())
+                .nationality(dto.nationality())
+                .maritalStatus(dto.maritalStatus())
+                .build();
     }
 
 }
