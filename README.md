@@ -280,7 +280,9 @@ This project is licensed under the **GNU General Public License v3.0 (GPL-3.0)**
 
 ---
 
-**Developer:** Mesut Ormanlı
+## Developer
+
+Mesut ORMANLI (mesutormanli@gmail.com)
 
 ---
 
@@ -566,4 +568,6 @@ Bu proje **GNU General Public License v3.0 (GPL-3.0)** ile lisanslanmıştır. D
 
 ---
 
-**Geliştirici:** Mesut Ormanlı
+## Geliştirici
+
+Mesut ORMANLI (mesutormanli@gmail.com)
