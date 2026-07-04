@@ -11,7 +11,7 @@ import org.mesutormanli.customerapi.model.response.CustomerDeleteResponse;
 import org.mesutormanli.customerapi.model.response.CustomerListResponse;
 import org.mesutormanli.customerapi.repository.CustomerRepository;
 import org.mesutormanli.customerapi.service.impl.CustomerServiceImpl;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.util.CollectionUtils;
 
 import java.util.Collections;
@@ -31,7 +31,7 @@ class CustomerServiceTest extends BaseServiceTest {
     private CustomerEntity customerEntity;
     private CustomerDto customerDto;
 
-    @MockBean
+    @MockitoBean
     private CustomerRepository repository;
 
     private CustomerService customerService;

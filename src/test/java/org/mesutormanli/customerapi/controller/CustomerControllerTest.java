@@ -8,9 +8,8 @@ import org.mesutormanli.customerapi.model.request.CustomerRequest;
 import org.mesutormanli.customerapi.model.response.CustomerDeleteResponse;
 import org.mesutormanli.customerapi.model.response.CustomerListResponse;
 import org.mesutormanli.customerapi.service.CustomerService;
-import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.context.WebApplicationContext;
@@ -25,7 +24,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 @WebMvcTest(value = CustomerController.class)
-@AutoConfigureRestDocs
 class CustomerControllerTest extends BaseControllerTest {
 
     private static final long CUSTOMER_ID = 1;
@@ -34,7 +32,7 @@ class CustomerControllerTest extends BaseControllerTest {
     private CustomerDto customerDto;
     private CustomerDeleteResponse customerDeleteResponse;
 
-    @MockBean
+    @MockitoBean
     private CustomerService customerService;
 
     @BeforeEach

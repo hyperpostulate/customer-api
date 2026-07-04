@@ -20,12 +20,12 @@ A SQLite-based REST API that performs CRUD (Create, Read, Update, Delete) operat
 | Category | Technology | Version |
 |---|---|---|
 | Language | Java | 25 (`--enable-preview`) |
-| Framework | Spring Boot | 3.5.11 |
+| Framework | Spring Boot | 4.1.0 |
 | Build Tool | Maven | With Wrapper |
 | Database | SQLite | sqlite-jdbc 3.46.0.0 |
-| ORM | Hibernate (Spring Data JPA) | 6.6.18.Final |
+| ORM | Hibernate (Spring Data JPA) | 7.4.1.Final |
 | Security | Spring Security | — |
-| HATEOAS | Spring HATEOAS | 2.5.1 |
+| HATEOAS | Spring HATEOAS | 3.1.1 |
 | Validation | Hibernate Validator | — |
 | Monitoring | Spring Boot Actuator | — |
 | API Docs | Spring REST Docs + Asciidoctor | — |
@@ -306,12 +306,12 @@ Müşteri kayıtları üzerinde CRUD (Create, Read, Update, Delete) işlemleri g
 | Kategori | Teknoloji | Sürüm |
 |---|---|---|
 | Dil | Java | 25 (`--enable-preview`) |
-| Framework | Spring Boot | 3.5.11 |
+| Framework | Spring Boot | 4.1.0 |
 | Yapı Aracı | Maven | Wrapper ile |
 | Veritabanı | SQLite | sqlite-jdbc 3.46.0.0 |
-| ORM | Hibernate (Spring Data JPA) | 6.6.18.Final |
+| ORM | Hibernate (Spring Data JPA) | 7.4.1.Final |
 | Güvenlik | Spring Security | — |
-| HATEOAS | Spring HATEOAS | 2.5.1 |
+| HATEOAS | Spring HATEOAS | 3.1.1 |
 | Doğrulama | Hibernate Validator | — |
 | Monitor | Spring Boot Actuator | — |
 | API Dokümanı | Spring REST Docs + Asciidoctor | — |
