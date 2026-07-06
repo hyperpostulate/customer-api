@@ -1,573 +1,739 @@
-# Customer API
+# customer-api
 
-A SQLite-based REST API that performs CRUD (Create, Read, Update, Delete) operations on customer records.
+[![Java CI](https://github.com/hyperpostulate/customer-api/actions/workflows/maven.yml/badge.svg)](https://github.com/hyperpostulate/customer-api/actions/workflows/maven.yml) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+
+REST API for a SQLite Database. Spring Boot application with JPA, HATEOAS, and soft-delete support.
+
+---
 
 ## Table of Contents
 
-- [Tech Stack](#tech-stack)
-- [Architecture](#architecture)
-- [API Endpoints](#api-endpoints)
-- [Data Model](#data-model)
-- [Setup](#setup)
-- [Running](#running)
-- [Test](#test)
-- [Docker](#docker)
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Build & Test](#build--test)
 - [CI/CD](#cicd)
+- [Architecture](#architecture)
+- [Components](#components)
+- [Usage Examples](#usage-examples)
+- [API Endpoints](#api-endpoints)
+- [Testing](#testing)
+- [Error Handling](#error-handling)
 - [License](#license)
+- [Developer](#developer)
+- [Contributing](#contributing)
 
-## Tech Stack
+---
 
-| Category | Technology | Version |
-|---|---|---|
-| Language | Java | 25 (`--enable-preview`) |
-| Framework | Spring Boot | 4.1.0 |
-| Build Tool | Maven | With Wrapper |
-| Database | SQLite | sqlite-jdbc 3.46.0.0 |
-| ORM | Hibernate (Spring Data JPA) | 7.4.1.Final |
-| Security | Spring Security | — |
-| HATEOAS | Spring HATEOAS | 3.1.1 |
-| Validation | Hibernate Validator | — |
-| Monitoring | Spring Boot Actuator | — |
-| API Docs | Spring REST Docs + Asciidoctor | — |
-| Test | JUnit 5, Mockito, Podam, Gson | — |
-| Container | Docker (eclipse-temurin:25-jre-alpine) | — |
+## Requirements
+
+| Requirement | Version |
+|-------------|---------|
+| Java | 25+ |
+| Maven | 3.8+ |
+
+---
+
+## Installation
+
+### Maven
+
+```xml
+<dependency>
+    <groupId>org.mesutormanli</groupId>
+    <artifactId>customer-api</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+</dependency>
+```
+
+### Manual Build
+
+```bash
+git clone https://github.com/hyperpostulate/customer-api.git
+cd customer-api
+mvn clean install
+```
+
+---
+
+## Build & Test
+
+```bash
+mvn clean test                    # Full build + tests
+mvn clean package                 # Build + tests + package
+mvn test -Dtest=CustomerControllerTest  # Single test class
+mvn test -Dtest=CustomerServiceTest     # Single test class
+```
+
+---
+
+## CI/CD
+
+GitHub Actions workflows (`.github/workflows/`):
+
+- **maven.yml**: Runs on every push. Ubuntu-latest, Amazon Corretto 25. Command: `mvn -B package`
+- **codeql.yml**: CodeQL security analysis
+- **qodana_code_quality.yml**: Qodana code quality inspection
+
+---
 
 ## Architecture
 
-The project follows a layered architecture:
-
 ```
-src/main/java/org/mesutormanli/customerapi/
+org.mesutormanli.customerapi
 ├── config/
-│   └── PersistenceConfig.java        # JPA / SQLite configuration
+│   ├── DataSourceConfig.java              # SQLite DataSource bean
+│   └── JpaConfig.java                     # JPA EntityManagerFactory + repos config
 ├── controller/
-│   ├── CustomerController.java       # Customer CRUD REST endpoints
-│   └── IndexController.java          # Root endpoint (HATEOAS link)
+│   ├── CustomerController.java            # REST endpoints for CRUD
+│   ├── CustomerResponseMapper.java        # Maps service results to ResponseEntity
+│   └── IndexController.java               # Root "/" HATEOAS index endpoint
 ├── model/
 │   ├── converter/
-│   │   └── CustomerConverter.java    # Entity ↔ DTO / Request conversions
+│   │   ├── CustomerReadConverter.java     # Entity -> DTO
+│   │   └── CustomerWriteConverter.java    # Request -> Entity
 │   ├── dto/
-│   │   └── CustomerDto.java          # Data transfer object (record)
+│   │   └── CustomerDto.java               # Java record, transfer object
 │   ├── entity/
-│   │   └── CustomerEntity.java       # JPA entity (with soft-delete)
+│   │   └── CustomerEntity.java            # JPA @Entity, table CUSTOMER
 │   ├── hateoas/
 │   │   └── CustomerControllerRepresentationModel.java
 │   ├── request/
-│   │   └── CustomerRequest.java      # Request body (record)
+│   │   └── CustomerRequest.java           # Java record, inbound request body
 │   └── response/
-│       ├── CustomerDeleteResponse.java
-│       └── CustomerListResponse.java
+│       ├── CustomerDeleteResponse.java    # Java record, delete response
+│       └── CustomerListResponse.java      # Java record, list response
 ├── repository/
-│   └── CustomerRepository.java       # JPA Repository interface
-└── service/
-    ├── CustomerService.java          # Service interface
-    └── impl/
-        └── CustomerServiceImpl.java  # Service implementation
+│   └── CustomerRepository.java            # Spring Data JPA interface
+├── service/
+│   ├── CustomerService.java               # Service interface
+│   └── impl/
+│       └── CustomerServiceImpl.java       # Service implementation
+└── CustomerApiApplication.java            # Application entry point
 ```
 
-### Layer Responsibilities
+### Core Components
 
-- **Controller** — Handles HTTP requests and returns responses.
-- **Service** — Executes business logic, orchestrates repository and converter.
-- **Repository** — Provides automatic CRUD operations via Spring Data JPA.
-- **Entity** — JPA entity mapped to the `CUSTOMER` table.
-- **Converter** — Performs conversions between Entity, DTO, and Request.
-- **Config** — Configures SQLite DataSource and Hibernate settings.
+| Component | Description |
+|-----------|-------------|
+| `CustomerController` | REST controller providing full CRUD for customers |
+| `CustomerService` | Service interface defining business operations |
+| `CustomerServiceImpl` | Service implementation with soft-delete support |
+| `CustomerRepository` | Spring Data JPA repository for `CustomerEntity` |
+| `CustomerEntity` | JPA entity with soft-delete via `@SQLDelete` |
+| `CustomerDto` | Immutable Java record for data transfer |
+| `CustomerRequest` | Java record for inbound request body |
+| `CustomerResponseMapper` | Maps service results to ResponseEntity with HTTP status |
+| `DataSourceConfig` | Reads `persistence.properties`, creates SQLite DataSource |
+| `JpaConfig` | Creates EntityManagerFactory with Hibernate SQLite dialect |
+| `CustomerReadConverter` | Converts Entity to DTO |
+| `CustomerWriteConverter` | Converts Request to Entity |
+
+### Dependencies
+
+| Dependency | Version | Purpose |
+|------------|---------|---------|
+| Spring Boot Web | 4.1.0 | REST/MVC framework |
+| Spring Boot Data JPA | 4.1.0 | JPA + Hibernate ORM |
+| Spring Boot HATEOAS | 4.1.0 | HATEOAS hypermedia |
+| Spring Boot Security | 4.1.0 | Security auto-configuration |
+| Spring Boot Actuator | 4.1.0 | Health/metrics endpoints |
+| Spring Boot Validation | 4.1.0 | Bean validation |
+| SQLite JDBC | 3.46.0.0 | SQLite JDBC driver |
+| Hibernate Community Dialects | - | Hibernate SQLite dialect |
+| PODAM | 7.2.11.RELEASE | Random test data generation (test) |
+| Gson | 2.11.0 | JSON serialization (test) |
+| Spring REST Docs MockMvc | - | REST API documentation (test) |
+| JUnit Jupiter | - | Test framework (test) |
+
+---
+
+## Components
+
+### CustomerController
+
+REST controller providing full CRUD operations for customers.
+
+| Method | Endpoint | Description | HTTP Status |
+|--------|----------|-------------|-------------|
+| `GET` | `/customer/{id}` | Get a single customer by ID | 200 / 404 |
+| `GET` | `/customers` | Get all customers | 200 |
+| `POST` | `/customer` | Create a new customer | 201 |
+| `PUT` | `/customer/{id}` | Update a customer by ID | 200 / 404 |
+| `DELETE` | `/customer/{id}` | Soft-delete a customer by ID | 204 / 404 |
+| `DELETE` | `/customers` | Delete all customers | 204 |
+
+### CustomerEntity
+
+JPA entity mapped to the `CUSTOMER` table with soft-delete support.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | `Long` | Auto-generated primary key |
+| `name` | `String` | Customer name |
+| `surname` | `String` | Customer surname |
+| `age` | `Integer` | Customer age |
+| `address` | `String` | Customer address |
+| `telephone` | `String` | Customer telephone |
+| `email` | `String` | Customer email |
+| `nationality` | `String` | Customer nationality |
+| `maritalStatus` | `String` | Customer marital status |
+| `deleted` | `Boolean` | Soft-delete flag |
+
+### IndexController
+
+Returns a HATEOAS `RepresentationModel` with a link to the `CustomerController`, serving as the API's discovery root.
+
+---
+
+## Usage Examples
+
+### Creating a Customer
+
+```bash
+curl -X POST http://localhost:8080/customer-api/customer \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "John",
+    "surname": "Doe",
+    "age": 30,
+    "address": "123 Main St",
+    "telephone": "+905551234567",
+    "email": "john.doe@example.com",
+    "nationality": "Turkish",
+    "maritalStatus": "Single"
+  }'
+```
+
+### Getting All Customers
+
+```bash
+curl http://localhost:8080/customer-api/customers
+```
+
+### Getting a Customer by ID
+
+```bash
+curl http://localhost:8080/customer-api/customer/1
+```
+
+### Updating a Customer
+
+```bash
+curl -X PUT http://localhost:8080/customer-api/customer/1 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "John",
+    "surname": "Doe",
+    "age": 31,
+    "address": "456 Oak Ave",
+    "telephone": "+905559876543",
+    "email": "john.doe@example.com",
+    "nationality": "Turkish",
+    "maritalStatus": "Married"
+  }'
+```
+
+### Deleting a Customer
+
+```bash
+curl -X DELETE http://localhost:8080/customer-api/customer/1
+```
+
+### Deleting All Customers
+
+```bash
+curl -X DELETE http://localhost:8080/customer-api/customers
+```
+
+### Accessing the API Index (HATEOAS)
+
+```bash
+curl http://localhost:8080/customer-api/
+```
+
+---
 
 ## API Endpoints
 
-All endpoints run under the `/customer-api` context path.
+All endpoints are served under the context path `/customer-api`.
 
-| Method | Endpoint | Description | Request | Response | Status Codes |
-|---|---|---|---|---|---|
-| `GET` | `/` | Root directory, returns HATEOAS link | — | HATEOAS model | `200 OK` |
-| `GET` | `/customer/{id}` | Retrieves customer by ID | — | `CustomerListResponse` | `200 OK`, `404 Not Found` |
-| `GET` | `/customers` | Lists all customers | — | `CustomerListResponse` | `200 OK` |
-| `POST` | `/customer` | Creates a new customer | `CustomerRequest` | `CustomerDto` | `201 Created` |
-| `PUT` | `/customer/{id}` | Updates a customer | `CustomerRequest` | `CustomerDto` | `200 OK`, `404 Not Found` |
-| `DELETE` | `/customer/{id}` | Soft-deletes a customer | — | `CustomerDeleteResponse` | `200 OK`, `204 No Content` |
-| `DELETE` | `/customers` | Soft-deletes all customers | — | `CustomerDeleteResponse` | `200 OK`, `204 No Content` |
-
-### Request / Response Examples
-
-**Create Customer (POST /customer-api/customer)**
-
-```json
-{
-  "name": "Ahmet",
-  "surname": "Yılmaz",
-  "age": 30,
-  "address": "İstanbul, Türkiye",
-  "telephone": "+90 555 123 45 67",
-  "email": "ahmet@ornek.com",
-  "nationality": "Türk",
-  "maritalStatus": "Bekar"
-}
-```
-
-**Successful Response (201 Created)**
-
-```json
-{
-  "id": 1,
-  "name": "Ahmet",
-  "surname": "Yılmaz",
-  "age": 30,
-  "address": "İstanbul, Türkiye",
-  "telephone": "+90 555 123 45 67",
-  "email": "ahmet@ornek.com",
-  "nationality": "Türk",
-  "maritalStatus": "Bekar"
-}
-```
+| Endpoint | Method | Description | Response |
+|----------|--------|-------------|----------|
+| `/customer/{id}` | GET | Get customer by ID | `CustomerListResponse` |
+| `/customers` | GET | Get all customers | `CustomerListResponse` |
+| `/customer` | POST | Create new customer | `CustomerListResponse` (201) |
+| `/customer/{id}` | PUT | Update customer | `CustomerListResponse` |
+| `/customer/{id}` | DELETE | Soft-delete customer | `CustomerDeleteResponse` (204) |
+| `/customers` | DELETE | Delete all customers | 204 |
+| `/` | GET | API discovery root (HATEOAS) | `RepresentationModel` |
 
 ### Actuator Endpoints
 
 | Endpoint | Description |
-|---|---|
-| `/actuator/health` | Application health check |
-| `/actuator/info` | Application information |
-| `/actuator/logfile` | Log file |
-| `/actuator/metrics` | Metrics |
+|----------|-------------|
+| `/customer-api/actuator/health` | Application health status |
+| `/customer-api/actuator/info` | Application info |
+| `/customer-api/actuator/logfile` | Application log file |
+| `/customer-api/actuator/metrics` | Application metrics |
 
-## Data Model
+---
 
-### CUSTOMER Table
+## Testing
 
-| Column | Type | Description |
-|---|---|---|
-| `id` | `BIGINT` | Primary key (auto-generated) |
-| `name` | `VARCHAR` | Customer name |
-| `surname` | `VARCHAR` | Customer surname |
-| `age` | `INTEGER` | Age |
-| `address` | `VARCHAR` | Address |
-| `telephone` | `VARCHAR` | Phone number |
-| `email` | `VARCHAR` | Email address |
-| `nationality` | `VARCHAR` | Nationality |
-| `maritalStatus` | `VARCHAR` | Marital status |
-| `deleted` | `BOOLEAN` | Soft-delete flag (default: false) |
+All tests use `@WebMvcTest` for controller tests and `@ExtendWith(SpringExtension.class)` for service tests. Test data is generated using PODAM via `GenericMockDataBuilder`.
 
-### Soft Delete
+### Test Classes
 
-Delete operations are performed as logical deletes (soft-delete) instead of physical deletes:
-- `DELETE` queries are transformed into `UPDATE CUSTOMER SET deleted = true WHERE id=?`.
-- Queries filter out deleted records by default (`@SQLRestriction`).
-- This prevents data loss and allows data recovery.
+| Test Class | What It Tests |
+|------------|---------------|
+| `CustomerControllerTest` | All 8 controller scenarios (success + not-found for each operation) |
+| `IndexControllerTest` | Root `/` endpoint returns HTTP 200 |
+| `PersistenceConfigTest` | DataSourceConfig creates correct DataSource, JpaConfig creates correct EntityManagerFactory |
+| `CustomerServiceTest` | All 10 service-layer scenarios (CRUD success + not-found/empty cases) |
+| `CustomerConverterTest` | Null-input handling for both converters |
+| `CustomerEntityTest` | Getters, builder, equals/hashCode, toString |
+| `CustomerRequestTest` | No-arg constructor and builder |
+| `CustomerDeleteResponseTest` | No-arg constructor and builder |
+| `CustomerListResponseTest` | No-arg constructor and builder |
 
-## Setup
-
-### Requirements
-
-- **Java 25** (JDK with preview features enabled)
-- **Maven 3.8+** (or Maven Wrapper)
-- **Docker** (optional, for container deployment)
-
-### Environment Variables
-
-The project does not require any environment variables. All configuration is done in `.properties` files.
-
-### Configuration
-
-**`src/main/resources/application.properties`** — Server, error handling, logging, and Actuator settings.
-
-**`src/main/resources/persistence.properties`** — SQLite connection, Hibernate dialect, and schema management.
-
-The SQLite database file (`CustomerDB.sqlite`) is automatically created in the project root directory.
-
-## Running
-
-### With Maven
+### Running Tests
 
 ```bash
-# Compile
-mvn clean compile
-
-# Package
-mvn package
-
-# Run
-java --enable-preview -jar target/customer-api-0.0.1-SNAPSHOT.jar
-```
-
-### With Maven Wrapper
-
-```bash
-./mvnw clean package
-java -jar target/customer-api-0.0.1-SNAPSHOT.jar
-```
-
-### With VS Code
-
-You can run it using the "Customer API" configuration defined in the `.vscode/launch.json` file.
-
-### With IntelliJ IDEA
-
-Import the project as a Maven project and run the `CustomerApiApplication.main()` method.
-
-## Test
-
-```bash
+# All tests
 mvn test
+
+# Single test class
+mvn test -Dtest=CustomerControllerTest
+
+# Single test method
+mvn test -Dtest=CustomerControllerTest#testGetCustomerById
 ```
 
-Tests use the following libraries:
-- **JUnit 5** — Test framework
-- **Mockito** — Mock objects
-- **Podam** — Random test data generation
-- **Gson** — JSON serialization
-- **Spring REST Docs MockMvc** — API documentation snippets
+### Test Helpers
 
-Test classes:
-- `BaseControllerTest` — Base class for controller tests
-- `BaseServiceTest` — Base class for service tests
-- `CustomerControllerTest` — Customer controller tests (with REST Docs)
-- `CustomerServiceTest` — Service layer unit tests
-- `CustomerEntityTest`, `CustomerRequestTest`, `CustomerConverterTest`, etc. — Model tests
+`BaseControllerTest` provides helper methods for controller tests:
 
-## Docker
-
-```bash
-# Build image
-docker build -t customer-api .
-
-# Run container
-docker run -p 8080:8080 customer-api
+```java
+protected void verifyResult(MockMvc mockMvc, String url, int expectedStatus) throws Exception {
+    mockMvc.perform(get(url))
+           .andExpect(status().isOk());
+}
 ```
 
-The Docker image is based on `eclipse-temurin:25-jre-alpine` and runs the JAR file.
+`CustomerMockDataBuilder` provides static factory methods to produce test data:
 
-## CI/CD
-
-Continuous integration is provided via GitHub Actions:
-
-| Workflow | Trigger | Description |
-|---|---|---|
-| **Java CI with Maven** (`maven.yml`) | Push/PR to `master` branch | Maven build with JDK 25 |
-| **CodeQL** (`codeql.yml`) | Push/PR to `master` branch, weekly | Security analysis |
-| **Qodana** (`qodana_code_quality.yml`) | Push/PR to `master` branch | Code quality analysis |
-
-## Project Structure
-
-```
-customer-api/
-├── .github/workflows/     # GitHub Actions CI/CD
-├── .mvn/wrapper/          # Maven Wrapper
-├── .vscode/               # VS Code configurations
-├── src/
-│   ├── main/
-│   │   ├── java/.../      # Source code
-│   │   └── resources/     # Configuration files
-│   └── test/java/.../     # Test code
-├── logs/                  # Application logs
-├── Dockerfile             # Docker image definition
-├── pom.xml                # Maven project definition
-├── qodana.yaml            # Qodana code quality settings
-├── LICENSE.txt            # GPL-3.0 license
-└── CustomerDB.sqlite      # SQLite database (created at runtime)
+```java
+CustomerDto dto = CustomerMockDataBuilder.aCustomerDto().build();
+CustomerRequest request = CustomerMockDataBuilder.aCustomerRequest().build();
 ```
 
-## Contributing
+---
 
-1. Fork this repository
-2. Create a new branch (`git checkout -b feature/new-feature`)
-3. Commit your changes (`git commit -am 'Add new feature'`)
-4. Push your branch (`git push origin feature/new-feature`)
-5. Create a Pull Request
+## Error Handling
+
+All HTTP and parse errors throw standard Spring exceptions. The `CustomerResponseMapper` translates service-layer return values into properly typed `ResponseEntity` objects with appropriate HTTP status codes:
+
+| Scenario | HTTP Status |
+|----------|-------------|
+| Resource found | 200 OK |
+| Resource created | 201 Created |
+| Resource deleted | 204 No Content |
+| Resource not found | 404 Not Found |
+
+---
 
 ## License
 
-This project is licensed under the **GNU General Public License v3.0 (GPL-3.0)**. See the `LICENSE.txt` file for details.
+This project is licensed under the GNU General Public License v3.0. See [LICENSE.txt](LICENSE.txt) for details.
 
 ---
 
 ## Developer
 
-Mesut ORMANLI (mesutormanli@gmail.com)
+**Mesut ORMANLI**
+
+- Email: [mesutormanli@gmail.com](mailto:mesutormanli@gmail.com)
+- GitHub: [@hyperpostulate](https://github.com/hyperpostulate)
 
 ---
 
-# Customer API
+## Contributing
 
-Müşteri kayıtları üzerinde CRUD (Create, Read, Update, Delete) işlemleri gerçekleştiren, SQLite tabanlı bir REST API.
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/new-feature`)
+3. Commit your changes (`git commit -m 'Add new feature'`)
+4. Push to the branch (`git push origin feature/new-feature`)
+5. Create a Pull Request
+
+---
+
+---
+
+---
+
+# customer-api
+
+[![Java CI](https://github.com/hyperpostulate/customer-api/actions/workflows/maven.yml/badge.svg)](https://github.com/hyperpostulate/customer-api/actions/workflows/maven.yml) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+
+SQLite Veritabanı için REST API. Spring Boot, JPA, HATEOAS ve soft-delete desteği ile oluşturulmuş uygulama.
+
+---
 
 ## İçindekiler
 
-- [Teknoloji Yığını](#teknoloji-yığını)
-- [Mimari](#mimari)
-- [API Uç Noktaları](#api-uç-noktaları)
-- [Veri Modeli](#veri-modeli)
+- [Gereksinimler](#gereksinimler)
 - [Kurulum](#kurulum)
-- [Çalıştırma](#çalıştırma)
-- [Test](#test)
-- [Docker](#docker)
+- [Derleme ve Test](#derleme-ve-test)
 - [CI/CD](#cicd)
+- [Mimari](#mimari)
+- [Bileşenler](#bileşenler)
+- [Kullanım Örnekleri](#kullanım-örnekleri)
+- [API Uç Noktaları](#api-uç-noktaları)
+- [Testler](#testler)
+- [Hata Yönetimi](#hata-yönetimi)
 - [Lisans](#lisans)
+- [Geliştirici](#geliştirici)
+- [Katkıda Bulunma](#katkıda-bulunma)
 
-## Teknoloji Yığını
+---
 
-| Kategori | Teknoloji | Sürüm |
-|---|---|---|
-| Dil | Java | 25 (`--enable-preview`) |
-| Framework | Spring Boot | 4.1.0 |
-| Yapı Aracı | Maven | Wrapper ile |
-| Veritabanı | SQLite | sqlite-jdbc 3.46.0.0 |
-| ORM | Hibernate (Spring Data JPA) | 7.4.1.Final |
-| Güvenlik | Spring Security | — |
-| HATEOAS | Spring HATEOAS | 3.1.1 |
-| Doğrulama | Hibernate Validator | — |
-| Monitor | Spring Boot Actuator | — |
-| API Dokümanı | Spring REST Docs + Asciidoctor | — |
-| Test | JUnit 5, Mockito, Podam, Gson | — |
-| Konteyner | Docker (eclipse-temurin:25-jre-alpine) | — |
+## Gereksinimler
+
+| Gereksinim | Sürüm |
+|------------|-------|
+| Java | 25+ |
+| Maven | 3.8+ |
+
+---
+
+## Kurulum
+
+### Maven
+
+```xml
+<dependency>
+    <groupId>org.mesutormanli</groupId>
+    <artifactId>customer-api</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+</dependency>
+```
+
+### Manuel Derleme
+
+```bash
+git clone https://github.com/hyperpostulate/customer-api.git
+cd customer-api
+mvn clean install
+```
+
+---
+
+## Derleme ve Test
+
+```bash
+mvn clean test                    # Tam derleme + testler
+mvn clean package                 # Derleme + test + paketleme
+mvn test -Dtest=CustomerControllerTest  # Tek test sınıfı
+mvn test -Dtest=CustomerServiceTest     # Tek test sınıfı
+```
+
+---
+
+## CI/CD
+
+GitHub Actions iş akışları (`.github/workflows/`):
+
+- **maven.yml**: Her push'ta çalışır. Ubuntu-latest, Amazon Corretto 25. Komut: `mvn -B package`
+- **codeql.yml**: CodeQL güvenlik analizi
+- **qodana_code_quality.yml**: Qodana kod kalitesi incelemesi
+
+---
 
 ## Mimari
 
-Proje katmanlı mimari ile yapılandırılmıştır:
-
 ```
-src/main/java/org/mesutormanli/customerapi/
+org.mesutormanli.customerapi
 ├── config/
-│   └── PersistenceConfig.java        # JPA / SQLite yapılandırması
+│   ├── DataSourceConfig.java              # SQLite DataSource bean
+│   └── JpaConfig.java                     # JPA EntityManagerFactory + repo yapılandırması
 ├── controller/
-│   ├── CustomerController.java       # Müşteri CRUD REST endpointleri
-│   └── IndexController.java          # Kök uç noktası (HATEOAS bağlantısı)
+│   ├── CustomerController.java            # CRUD için REST uç noktaları
+│   ├── CustomerResponseMapper.java        # Servis sonuçlarını ResponseEntity'e dönüştürür
+│   └── IndexController.java               # Kök "/" HATEOAS indeks uç noktası
 ├── model/
 │   ├── converter/
-│   │   └── CustomerConverter.java    # Entity ↔ DTO / Request dönüşümleri
+│   │   ├── CustomerReadConverter.java     # Entity -> DTO
+│   │   └── CustomerWriteConverter.java    # Request -> Entity
 │   ├── dto/
-│   │   └── CustomerDto.java          # Veri transfer nesnesi (record)
+│   │   └── CustomerDto.java               # Java record, veri aktarım nesnesi
 │   ├── entity/
-│   │   └── CustomerEntity.java       # JPA varlığı (soft-delete ile)
+│   │   └── CustomerEntity.java            # JPA @Entity, CUSTOMER tablosu
 │   ├── hateoas/
 │   │   └── CustomerControllerRepresentationModel.java
 │   ├── request/
-│   │   └── CustomerRequest.java      # İstek gövdesi (record)
+│   │   └── CustomerRequest.java           # Java record, gelen istek gövdesi
 │   └── response/
-│       ├── CustomerDeleteResponse.java
-│       └── CustomerListResponse.java
+│       ├── CustomerDeleteResponse.java    # Java record, silme yanıtı
+│       └── CustomerListResponse.java      # Java record, listeleme yanıtı
 ├── repository/
-│   └── CustomerRepository.java       # JPA Repository arayüzü
-└── service/
-    ├── CustomerService.java          # Servis arayüzü
-    └── impl/
-        └── CustomerServiceImpl.java  # Servis gerçeklemesi
+│   └── CustomerRepository.java            # Spring Data JPA arayüzü
+├── service/
+│   ├── CustomerService.java               # Servis arayüzü
+│   └── impl/
+│       └── CustomerServiceImpl.java       # Servis uygulaması
+└── CustomerApiApplication.java            # Uygulama giriş noktası
 ```
 
-### Katman Sorumlulukları
+### Temel Bileşenler
 
-- **Controller** — HTTP isteklerini karşılar, yanıtları döner.
-- **Service** — İş mantığını yürütür, repository ve converter'ı orchestre eder.
-- **Repository** — Spring Data JPA sayesinde CRUD işlemlerini otomatik olarak sağlar.
-- **Entity** — `CUSTOMER` tablosuna eşlenen JPA varlığı.
-- **Converter** — Entity, DTO ve Request arasında dönüşüm yapar.
-- **Config** — SQLite DataSource ve Hibernate ayarlarını yapar.
+| Bileşen | Açıklama |
+|---------|----------|
+| `CustomerController` | Müşteriler için tam CRUD sağlayan REST kontrolcüsü |
+| `CustomerService` | İş operasyonlarını tanımlayan servis arayüzü |
+| `CustomerServiceImpl` | Soft-delete desteğiyle servis uygulaması |
+| `CustomerRepository` | `CustomerEntity` için Spring Data JPA deposu |
+| `CustomerEntity` | `@SQLDelete` ile soft-delete destekli JPA entity'si |
+| `CustomerDto` | Veri transferi için değişmez Java record |
+| `CustomerRequest` | Gelen istek gövdesi için Java record |
+| `CustomerResponseMapper` | Servis sonuçlarını HTTP durum kodlarıyla ResponseEntity'e dönüştürür |
+| `DataSourceConfig` | `persistence.properties` dosyasını okur, SQLite DataSource oluşturur |
+| `JpaConfig` | Hibernate SQLite diyalekti ile EntityManagerFactory oluşturur |
+| `CustomerReadConverter` | Entity'yi DTO'ya dönüştürür |
+| `CustomerWriteConverter` | Request'i Entity'ye dönüştürür |
+
+### Bağımlılıklar
+
+| Bağımlılık | Sürüm | Amaç |
+|------------|-------|------|
+| Spring Boot Web | 4.1.0 | REST/MVC çerçevesi |
+| Spring Boot Data JPA | 4.1.0 | JPA + Hibernate ORM |
+| Spring Boot HATEOAS | 4.1.0 | HATEOAS hipermedya |
+| Spring Boot Security | 4.1.0 | Güvenlik otomatik yapılandırması |
+| Spring Boot Actuator | 4.1.0 | Sağlık/metrik uç noktaları |
+| Spring Boot Validation | 4.1.0 | Bean doğrulama |
+| SQLite JDBC | 3.46.0.0 | SQLite JDBC sürücüsü |
+| Hibernate Community Dialects | - | Hibernate SQLite diyalekti |
+| PODAM | 7.2.11.RELEASE | Rastgele test verisi üretimi (test) |
+| Gson | 2.11.0 | JSON serileştirme (test) |
+| Spring REST Docs MockMvc | - | REST API dokümantasyonu (test) |
+| JUnit Jupiter | - | Test çerçevesi (test) |
+
+---
+
+## Bileşenler
+
+### CustomerController
+
+Müşteriler için tam CRUD işlemleri sağlayan REST kontrolcüsü.
+
+| Yöntem | Uç Nokta | Açıklama | HTTP Durumu |
+|--------|----------|----------|-------------|
+| `GET` | `/customer/{id}` | ID ile tek müşteri getir | 200 / 404 |
+| `GET` | `/customers` | Tüm müşterileri getir | 200 |
+| `POST` | `/customer` | Yeni müşteri oluştur | 201 |
+| `PUT` | `/customer/{id}` | ID ile müşteriyi güncelle | 200 / 404 |
+| `DELETE` | `/customer/{id}` | ID ile müşteriyi soft-delete | 204 / 404 |
+| `DELETE` | `/customers` | Tüm müşterileri sil | 204 |
+
+### CustomerEntity
+
+Soft-delete desteğiyle `CUSTOMER` tablosuna eşlenen JPA entity'si.
+
+| Alan | Tür | Açıklama |
+|------|-----|----------|
+| `id` | `Long` | Otomatik üretilen birincil anahtar |
+| `name` | `String` | Müşteri adı |
+| `surname` | `String` | Müşteri soyadı |
+| `age` | `Integer` | Müşteri yaşı |
+| `address` | `String` | Müşteri adresi |
+| `telephone` | `String` | Müşteri telefonu |
+| `email` | `String` | Müşteri e-postası |
+| `nationality` | `String` | Müşteri uyruğu |
+| `maritalStatus` | `String` | Müşteri medeni durumu |
+| `deleted` | `Boolean` | Soft-delete bayrağı |
+
+### IndexController
+
+API'nin keşif kökü olarak hizmet veren, `CustomerController`'a bağlantı içeren bir HATEOAS `RepresentationModel` döndürür.
+
+---
+
+## Kullanım Örnekleri
+
+### Müşteri Oluşturma
+
+```bash
+curl -X POST http://localhost:8080/customer-api/customer \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "John",
+    "surname": "Doe",
+    "age": 30,
+    "address": "123 Main St",
+    "telephone": "+905551234567",
+    "email": "john.doe@example.com",
+    "nationality": "Turkish",
+    "maritalStatus": "Single"
+  }'
+```
+
+### Tüm Müşterileri Getirme
+
+```bash
+curl http://localhost:8080/customer-api/customers
+```
+
+### ID ile Müşteri Getirme
+
+```bash
+curl http://localhost:8080/customer-api/customer/1
+```
+
+### Müşteri Güncelleme
+
+```bash
+curl -X PUT http://localhost:8080/customer-api/customer/1 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "John",
+    "surname": "Doe",
+    "age": 31,
+    "address": "456 Oak Ave",
+    "telephone": "+905559876543",
+    "email": "john.doe@example.com",
+    "nationality": "Turkish",
+    "maritalStatus": "Married"
+  }'
+```
+
+### Müşteri Silme
+
+```bash
+curl -X DELETE http://localhost:8080/customer-api/customer/1
+```
+
+### Tüm Müşterileri Silme
+
+```bash
+curl -X DELETE http://localhost:8080/customer-api/customers
+```
+
+### API İndeksine Erişme (HATEOAS)
+
+```bash
+curl http://localhost:8080/customer-api/
+```
+
+---
 
 ## API Uç Noktaları
 
-Tüm uç noktalar `/customer-api` context path'i altında çalışır.
+Tüm uç noktalar `/customer-api` bağlam yolu altında sunulur.
 
-| Yöntem | Uç Nokta | Açıklama | İstek | Yanıt | Durum Kodları |
-|---|---|---|---|---|---|
-| `GET` | `/` | Kök dizin, HATEOAS bağlantısı döner | — | HATEOAS model | `200 OK` |
-| `GET` | `/customer/{id}` | ID'ye göre müşteri getirir | — | `CustomerListResponse` | `200 OK`, `404 Not Found` |
-| `GET` | `/customers` | Tüm müşterileri listeler | — | `CustomerListResponse` | `200 OK` |
-| `POST` | `/customer` | Yeni müşteri oluşturur | `CustomerRequest` | `CustomerDto` | `201 Created` |
-| `PUT` | `/customer/{id}` | Müşteriyi günceller | `CustomerRequest` | `CustomerDto` | `200 OK`, `404 Not Found` |
-| `DELETE` | `/customer/{id}` | Müşteriyi soft-delete eder | — | `CustomerDeleteResponse` | `200 OK`, `204 No Content` |
-| `DELETE` | `/customers` | Tüm müşterileri soft-delete eder | — | `CustomerDeleteResponse` | `200 OK`, `204 No Content` |
-
-### İstek/ Yanıt Örnekleri
-
-**Müşteri Oluşturma (POST /customer-api/customer)**
-
-```json
-{
-  "name": "Ahmet",
-  "surname": "Yılmaz",
-  "age": 30,
-  "address": "İstanbul, Türkiye",
-  "telephone": "+90 555 123 45 67",
-  "email": "ahmet@ornek.com",
-  "nationality": "Türk",
-  "maritalStatus": "Bekar"
-}
-```
-
-**Başarılı Yanıt (201 Created)**
-
-```json
-{
-  "id": 1,
-  "name": "Ahmet",
-  "surname": "Yılmaz",
-  "age": 30,
-  "address": "İstanbul, Türkiye",
-  "telephone": "+90 555 123 45 67",
-  "email": "ahmet@ornek.com",
-  "nationality": "Türk",
-  "maritalStatus": "Bekar"
-}
-```
+| Uç Nokta | Yöntem | Açıklama | Yanıt |
+|----------|--------|----------|-------|
+| `/customer/{id}` | GET | ID ile müşteri getir | `CustomerListResponse` |
+| `/customers` | GET | Tüm müşterileri getir | `CustomerListResponse` |
+| `/customer` | POST | Yeni müşteri oluştur | `CustomerListResponse` (201) |
+| `/customer/{id}` | PUT | Müşteriyi güncelle | `CustomerListResponse` |
+| `/customer/{id}` | DELETE | Müşteriyi soft-delete | `CustomerDeleteResponse` (204) |
+| `/customers` | DELETE | Tüm müşterileri sil | 204 |
+| `/` | GET | API keşif kökü (HATEOAS) | `RepresentationModel` |
 
 ### Actuator Uç Noktaları
 
 | Uç Nokta | Açıklama |
-|---|---|
-| `/actuator/health` | Uygulama sağlık kontrolü |
-| `/actuator/info` | Uygulama bilgisi |
-| `/actuator/logfile` | Log dosyası |
-| `/actuator/metrics` | Metrikler |
+|----------|----------|
+| `/customer-api/actuator/health` | Uygulama sağlık durumu |
+| `/customer-api/actuator/info` | Uygulama bilgisi |
+| `/customer-api/actuator/logfile` | Uygulama log dosyası |
+| `/customer-api/actuator/metrics` | Uygulama metrikleri |
 
-## Veri Modeli
+---
 
-### CUSTOMER Tablosu
+## Testler
 
-| Sütun | Tür | Açıklama |
-|---|---|---|
-| `id` | `BIGINT` | Birincil anahtar (oto-oluşturulur) |
-| `name` | `VARCHAR` | Müşteri adı |
-| `surname` | `VARCHAR` | Müşteri soyadı |
-| `age` | `INTEGER` | Yaş |
-| `address` | `VARCHAR` | Adres |
-| `telephone` | `VARCHAR` | Telefon numarası |
-| `email` | `VARCHAR` | E-posta adresi |
-| `nationality` | `VARCHAR` | Uyruk |
-| `maritalStatus` | `VARCHAR` | Medeni durum |
-| `deleted` | `BOOLEAN` | Soft-delete bayrağı (varsayılan: false) |
+Tüm testler kontrolcü testleri için `@WebMvcTest` ve servis testleri için `@ExtendWith(SpringExtension.class)` kullanır. Test verileri PODAM kullanılarak `GenericMockDataBuilder` aracılığıyla üretilir.
 
-### Soft Delete
+### Test Sınıfları
 
-Silme işlemleri fiziksel silme yerine mantıksal silme (soft-delete) olarak gerçekleştirilir:
-- `DELETE` sorguları `UPDATE CUSTOMER SET deleted = true WHERE id=?` şeklinde dönüştürülür.
-- Sorgular varsayılan olarak silinmiş kayıtları filtreler (`@SQLRestriction`).
-- Bu sayede veri kaybı önlenir ve veri kurtarma mümkün olur.
+| Test Sınıfı | Ne Test Eder |
+|-------------|--------------|
+| `CustomerControllerTest` | 8 kontrolcü senaryosunun tamamı (her operasyon için başarı + bulunamadı) |
+| `IndexControllerTest` | Kök `/` uç noktasının HTTP 200 döndürmesi |
+| `PersistenceConfigTest` | DataSourceConfig'in doğru DataSource oluşturması, JpaConfig'in doğru EntityManagerFactory oluşturması |
+| `CustomerServiceTest` | 10 servis katmanı senaryosunun tamamı (CRUD başarı + bulunamadı/boş durumlar) |
+| `CustomerConverterTest` | Her iki dönüştürücü için null-girdi işleme |
+| `CustomerEntityTest` | Getter'lar, builder, equals/hashCode, toString |
+| `CustomerRequestTest` | Argümansız constructor ve builder |
+| `CustomerDeleteResponseTest` | Argümansız constructor ve builder |
+| `CustomerListResponseTest` | Argümansız constructor ve builder |
 
-## Kurulum
-
-### Gereksinimler
-
-- **Java 25** (JDK, preview özellikleri etkin)
-- **Maven 3.8+** (veya Maven Wrapper)
-- **Docker** (isteğe bağlı, konteyner dağıtımı için)
-
-### Ortam Değişkenleri
-
-Proje herhangi bir ortam değişkeni gerektirmez. Tüm yapılandırma `.properties` dosyalarında yapılır.
-
-### Yapılandırma
-
-**`src/main/resources/application.properties`** — Sunucu, hata yönetimi, loglama ve Actuator ayarları.
-
-**`src/main/resources/persistence.properties`** — SQLite bağlantısı, Hibernate dialekt ve şema yönetimi.
-
-SQLite veritabanı dosyası (`CustomerDB.sqlite`) otomatik olarak proje kök dizininde oluşturulur.
-
-## Çalıştırma
-
-### Maven ile
+### Test Çalıştırma
 
 ```bash
-# Derleme
-mvn clean compile
-
-# Paketleme
-mvn package
-
-# Çalıştırma
-java --enable-preview -jar target/customer-api-0.0.1-SNAPSHOT.jar
-```
-
-### Maven Wrapper ile
-
-```bash
-./mvnw clean package
-java -jar target/customer-api-0.0.1-SNAPSHOT.jar
-```
-
-### VS Code ile
-
-`.vscode/launch.json` dosyasında tanımlı "Customer API" konfigürasyonu ile çalıştırabilirsiniz.
-
-### IntelliJ IDEA ile
-
-Projeyi Maven projesi olarak içe aktarın ve `CustomerApiApplication.main()` metodunu çalıştırın.
-
-## Test
-
-```bash
+# Tüm testler
 mvn test
+
+# Tek test sınıfı
+mvn test -Dtest=CustomerControllerTest
+
+# Tek test metodu
+mvn test -Dtest=CustomerControllerTest#testGetCustomerById
 ```
 
-Testler şu kütüphaneleri kullanır:
-- **JUnit 5** — Test framework'ü
-- **Mockito** — Mock nesneler
-- **Podam** — Rastgele test verisi üretimi
-- **Gson** — JSON serileştirme
-- **Spring REST Docs MockMvc** — API dokümantasyon snippet'leri
+### Test Yardımcıları
 
-Test sınıfları:
-- `BaseControllerTest` — Controller testleri için temel sınıf
-- `BaseServiceTest` — Servis testleri için temel sınıf
-- `CustomerControllerTest` — Müşteri controller testleri (REST Docs ile)
-- `CustomerServiceTest` — Servis katmanı birim testleri
-- `CustomerEntityTest`, `CustomerRequestTest`, `CustomerConverterTest` vb. — Model testleri
+`BaseControllerTest`, kontrolcü testleri için yardımcı metodlar sağlar:
 
-## Docker
-
-```bash
-# İmajı oluşturma
-docker build -t customer-api .
-
-# Konteynerı çalıştırma
-docker run -p 8080:8080 customer-api
+```java
+protected void verifyResult(MockMvc mockMvc, String url, int expectedStatus) throws Exception {
+    mockMvc.perform(get(url))
+           .andExpect(status().isOk());
+}
 ```
 
-Docker imajı `eclipse-temurin:25-jre-alpine` tabanlıdır ve JAR dosyasını çalıştırır.
+`CustomerMockDataBuilder`, test verileri üretmek için statik fabrika metodları sağlar:
 
-## CI/CD
-
-GitHub Actions ile sürekli entegrasyon sağlanır:
-
-| İş Akışı | Tetikleyici | Açıklama |
-|---|---|---|
-| **Java CI with Maven** (`maven.yml`) | `master` branch'ine push/PR | JDK 25 ile Maven build |
-| **CodeQL** (`codeql.yml`) | `master` branch'ine push/PR, haftalık | Güvenlik analizi |
-| **Qodana** (`qodana_code_quality.yml`) | `master` branch'ine push/PR | Kod kalitesi analizi |
-
-## Proje Yapısı
-
-```
-customer-api/
-├── .github/workflows/     # GitHub Actions CI/CD
-├── .mvn/wrapper/          # Maven Wrapper
-├── .vscode/               # VS Code konfigürasyonları
-├── src/
-│   ├── main/
-│   │   ├── java/.../      # Kaynak kod
-│   │   └── resources/     # Yapılandırma dosyaları
-│   └── test/java/.../     # Test kodları
-├── logs/                  # Uygulama logları
-├── Dockerfile             # Docker imaj tanımı
-├── pom.xml                # Maven proje tanımı
-├── qodana.yaml            # Qodana kod kalite ayarları
-├── LICENSE.txt            # GPL-3.0 lisansı
-└── CustomerDB.sqlite      # SQLite veritabanı (çalışma zamanında oluşur)
+```java
+CustomerDto dto = CustomerMockDataBuilder.aCustomerDto().build();
+CustomerRequest request = CustomerMockDataBuilder.aCustomerRequest().build();
 ```
 
-## Katkıda Bulunma
+---
 
-1. Bu depoyu fork edin
-2. Yeni bir branch oluşturun (`git checkout -b feature/yeni-ozellik`)
-3. Değişikliklerinizi commit edin (`git commit -am 'Yeni özellik eklendi'`)
-4. Branch'inizi push edin (`git push origin feature/yeni-ozellik`)
-5. Bir Pull Request oluşturun
+## Hata Yönetimi
+
+Tüm HTTP ve parse hataları standart Spring istisnaları fırlatır. `CustomerResponseMapper`, servis katmanı sonuçlarını uygun HTTP durum kodlarıyla doğru türde `ResponseEntity` nesnelerine dönüştürür:
+
+| Senaryo | HTTP Durumu |
+|---------|-------------|
+| Kaynak bulundu | 200 OK |
+| Kaynak oluşturuldu | 201 Created |
+| Kaynak silindi | 204 No Content |
+| Kaynak bulunamadı | 404 Not Found |
+
+---
 
 ## Lisans
 
-Bu proje **GNU General Public License v3.0 (GPL-3.0)** ile lisanslanmıştır. Detaylar için `LICENSE.txt` dosyasına bakın.
+Bu proje GNU General Public License v3.0 altında lisanslanmıştır. Detaylı bilgi için [LICENSE.txt](LICENSE.txt) dosyasına bakın.
 
 ---
 
 ## Geliştirici
 
-Mesut ORMANLI (mesutormanli@gmail.com)
+**Mesut ORMANLI**
+
+- E-posta: [mesutormanli@gmail.com](mailto:mesutormanli@gmail.com)
+- GitHub: [@hyperpostulate](https://github.com/hyperpostulate)
+
+---
+
+## Katkıda Bulunma
+
+1. Depoyu fork edin
+2. Bir özellik dalı oluşturun (`git checkout -b feature/new-feature`)
+3. Değişikliklerinizi Commit edin (`git commit -m 'Add new feature'`)
+4. Dalı itin (`git push origin feature/new-feature`)
+5. Bir Pull Request oluşturun
