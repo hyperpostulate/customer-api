@@ -64,6 +64,22 @@ mvn test -Dtest=CustomerControllerTest  # Single test class
 mvn test -Dtest=CustomerServiceTest     # Single test class
 ```
 
+### Docker
+
+```bash
+mvn clean package -DskipTests         # Build JAR
+docker build -t customer-api .       # Build image
+docker run -p 8080:8080 customer-api  # Run container
+```
+
+The API will be available at `http://localhost:8080/customer-api`.
+
+```bash
+docker run -d -p 8080:8080 --name customer-api customer-api  # Run in background
+docker stop customer-api              # Stop container
+docker rm customer-api                # Remove container
+```
+
 ---
 
 ## CI/CD
@@ -435,6 +451,22 @@ mvn clean test                    # Tam derleme + testler
 mvn clean package                 # Derleme + test + paketleme
 mvn test -Dtest=CustomerControllerTest  # Tek test sınıfı
 mvn test -Dtest=CustomerServiceTest     # Tek test sınıfı
+```
+
+### Docker
+
+```bash
+mvn clean package -DskipTests         # JAR'ı derle
+docker build -t customer-api .       # İmajı oluştur
+docker run -p 8080:8080 customer-api  # Konteyneri çalıştır
+```
+
+API `http://localhost:8080/customer-api` adresinde kullanılabilir olur.
+
+```bash
+docker run -d -p 8080:8080 --name customer-api customer-api  # Arka planda çalıştır
+docker stop customer-api              # Konteyneri durdur
+docker rm customer-api                # Konteyneri kaldır
 ```
 
 ---
