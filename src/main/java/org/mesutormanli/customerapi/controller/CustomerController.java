@@ -5,72 +5,49 @@ import org.mesutormanli.customerapi.model.request.CustomerRequest;
 import org.mesutormanli.customerapi.model.response.CustomerDeleteResponse;
 import org.mesutormanli.customerapi.model.response.CustomerListResponse;
 import org.mesutormanli.customerapi.service.CustomerService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 public final class CustomerController {
 
     private final CustomerService customerService;
+    private final CustomerResponseMapper responseMapper;
 
-    public CustomerController(CustomerService customerService) {
+    public CustomerController(CustomerService customerService, CustomerResponseMapper responseMapper) {
         this.customerService = customerService;
+        this.responseMapper = responseMapper;
     }
 
     @GetMapping("/customer/{id}")
     public ResponseEntity<CustomerListResponse> getCustomer(@PathVariable("id") Long id) {
-        CustomerListResponse response = customerService.getCustomer(id);
-
-        if (CollectionUtils.isEmpty(response.customers())) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } else {
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        }
-
+        return responseMapper.toGetResponse(customerService.getCustomer(id));
     }
 
     @GetMapping("/customers")
     public ResponseEntity<CustomerListResponse> getAllCustomers() {
-        CustomerListResponse response = customerService.getAllCustomers();
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return responseMapper.toGetAllResponse(customerService.getAllCustomers());
     }
 
     @PostMapping("/customer")
     public ResponseEntity<CustomerDto> createCustomer(@RequestBody CustomerRequest request) {
-        return new ResponseEntity<>(customerService.createCustomer(request), HttpStatus.CREATED);
+        return responseMapper.toCreateResponse(customerService.createCustomer(request));
     }
 
     @PutMapping("/customer/{id}")
     public ResponseEntity<CustomerDto> updateCustomer(@PathVariable("id") Long id,
             @RequestBody CustomerRequest request) {
-        CustomerDto customerDto = customerService.updateCustomer(id, request);
-        if (null == customerDto) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } else {
-            return new ResponseEntity<>(customerDto, HttpStatus.OK);
-        }
+        return responseMapper.toUpdateResponse(customerService.updateCustomer(id, request));
     }
 
     @DeleteMapping("/customer/{id}")
     public ResponseEntity<CustomerDeleteResponse> deleteCustomer(@PathVariable("id") Long id) {
-        CustomerDeleteResponse response = customerService.deleteCustomer(id);
-        if (0L == response.deletedCustomerCount()) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } else {
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        }
+        return responseMapper.toDeleteResponse(customerService.deleteCustomer(id));
     }
 
     @DeleteMapping("/customers")
     public ResponseEntity<CustomerDeleteResponse> deleteAllCustomers() {
-        CustomerDeleteResponse response = customerService.deleteAllCustomers();
-        if (0L == response.deletedCustomerCount()) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } else {
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        }
+        return responseMapper.toDeleteAllResponse(customerService.deleteAllCustomers());
     }
 
 }

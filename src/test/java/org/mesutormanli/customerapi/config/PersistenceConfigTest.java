@@ -14,12 +14,14 @@ import static org.mockito.Mockito.*;
 class PersistenceConfigTest {
 
     private Environment env;
-    private PersistenceConfig config;
+    private DataSourceConfig dataSourceConfig;
+    private JpaConfig jpaConfig;
 
     @BeforeEach
     void setUp() {
         env = mock(Environment.class);
-        config = new PersistenceConfig(env);
+        dataSourceConfig = new DataSourceConfig(env);
+        jpaConfig = new JpaConfig(env);
     }
 
     @Test
@@ -27,7 +29,7 @@ class PersistenceConfigTest {
         when(env.getProperty("dataSource.driverClassName")).thenReturn("org.sqlite.JDBC");
         when(env.getProperty("dataSource.url")).thenReturn("jdbc:sqlite:CustomerDB.sqlite");
 
-        DataSource dataSource = config.dataSource();
+        DataSource dataSource = dataSourceConfig.dataSource();
 
         assertNotNull(dataSource);
         assertTrue(dataSource instanceof DriverManagerDataSource);
@@ -44,7 +46,8 @@ class PersistenceConfigTest {
         when(env.getProperty("hibernate.dialect")).thenReturn("org.hibernate.community.dialect.SQLiteDialect");
         when(env.getProperty("hibernate.show_sql")).thenReturn("true");
 
-        LocalContainerEntityManagerFactoryBean em = config.entityManagerFactory();
+        DataSource dataSource = dataSourceConfig.dataSource();
+        LocalContainerEntityManagerFactoryBean em = jpaConfig.entityManagerFactory(dataSource);
 
         assertNotNull(em);
         assertNotNull(em.getDataSource());

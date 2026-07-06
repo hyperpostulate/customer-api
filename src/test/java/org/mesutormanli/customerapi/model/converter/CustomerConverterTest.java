@@ -10,22 +10,24 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 class CustomerConverterTest extends BaseServiceTest {
 
-    private CustomerConverter customerConverter;
+    private CustomerReadConverter readConverter;
+    private CustomerWriteConverter writeConverter;
 
     @BeforeEach
     void setUp() {
-        customerConverter = new CustomerConverter();
+        readConverter = new CustomerReadConverter();
+        writeConverter = new CustomerWriteConverter();
     }
 
     @Test
     void toDto_null() {
-        final CustomerDto customerDto = customerConverter.toDto(null);
+        final CustomerDto customerDto = readConverter.toDto(null);
         assertNull(customerDto);
     }
 
     @Test
     void toEntity_null() {
-        final CustomerEntity customerEntity = customerConverter.toEntity(null);
+        final CustomerEntity customerEntity = writeConverter.toEntity(null);
         assertNull(customerEntity);
     }
 

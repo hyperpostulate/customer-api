@@ -5,14 +5,17 @@ import org.junit.jupiter.api.Test;
 import org.mesutormanli.customerapi.base.BaseControllerTest;
 import org.mesutormanli.customerapi.model.dto.CustomerDto;
 import org.mesutormanli.customerapi.model.request.CustomerRequest;
-import org.mesutormanli.customerapi.model.response.CustomerDeleteResponse;
-import org.mesutormanli.customerapi.model.response.CustomerListResponse;
 import org.mesutormanli.customerapi.service.CustomerService;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.context.WebApplicationContext;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mesutormanli.customerapi.builder.CustomerMockDataBuilder.*;
@@ -24,13 +27,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 @WebMvcTest(value = CustomerController.class)
+@Import(CustomerResponseMapper.class)
 class CustomerControllerTest extends BaseControllerTest {
 
     private static final long CUSTOMER_ID = 1;
-    private CustomerListResponse customerListResponse;
     private CustomerRequest customerRequest;
     private CustomerDto customerDto;
-    private CustomerDeleteResponse customerDeleteResponse;
 
     @MockitoBean
     private CustomerService customerService;
@@ -38,10 +40,8 @@ class CustomerControllerTest extends BaseControllerTest {
     @BeforeEach
     void setUp(WebApplicationContext webApplicationContext,
             RestDocumentationContextProvider restDocumentation) {
-        customerListResponse = generateCustomerListResponse(CUSTOMER_ID);
         customerRequest = generateCustomerRequest();
         customerDto = generateCustomerDto(CUSTOMER_ID);
-        customerDeleteResponse = generateCustomerDeleteResponse();
 
         this.mockMvc = webAppContextSetup(webApplicationContext)
                 .apply(documentationConfiguration(restDocumentation))
@@ -52,7 +52,7 @@ class CustomerControllerTest extends BaseControllerTest {
 
     @Test
     void getCustomer() {
-        when(customerService.getCustomer(CUSTOMER_ID)).thenReturn(customerListResponse);
+        when(customerService.getCustomer(CUSTOMER_ID)).thenReturn(Optional.of(customerDto));
         try {
             mockMvc.perform(get("/customer/{id}", CUSTOMER_ID))
                     .andExpect(MockMvcResultMatchers.status().isOk());
@@ -65,7 +65,7 @@ class CustomerControllerTest extends BaseControllerTest {
 
     @Test
     void getCustomer_notFound() {
-        when(customerService.getCustomer(CUSTOMER_ID)).thenReturn(CustomerListResponse.builder().build());
+        when(customerService.getCustomer(CUSTOMER_ID)).thenReturn(Optional.empty());
         try {
             mockMvc.perform(get("/customer/{id}", CUSTOMER_ID))
                     .andExpect(MockMvcResultMatchers.status().isNotFound());
@@ -79,7 +79,7 @@ class CustomerControllerTest extends BaseControllerTest {
 
     @Test
     void getAllCustomers() {
-        when(customerService.getAllCustomers()).thenReturn(customerListResponse);
+        when(customerService.getAllCustomers()).thenReturn(Collections.singletonList(customerDto));
         try {
             mockMvc.perform(get("/customers", CUSTOMER_ID))
                     .andExpect(MockMvcResultMatchers.status().isOk());
@@ -110,7 +110,7 @@ class CustomerControllerTest extends BaseControllerTest {
 
     @Test
     void updateCustomer() {
-        when(customerService.updateCustomer(CUSTOMER_ID, customerRequest)).thenReturn(customerDto);
+        when(customerService.updateCustomer(CUSTOMER_ID, customerRequest)).thenReturn(Optional.of(customerDto));
         try {
             mockMvc.perform(put("/customer/{id}", CUSTOMER_ID)
                             .contentType(contentType)
@@ -126,7 +126,7 @@ class CustomerControllerTest extends BaseControllerTest {
 
     @Test
     void updateCustomer_notFound() {
-        when(customerService.updateCustomer(CUSTOMER_ID, customerRequest)).thenReturn(null);
+        when(customerService.updateCustomer(CUSTOMER_ID, customerRequest)).thenReturn(Optional.empty());
         try {
             mockMvc.perform(put("/customer/{id}", CUSTOMER_ID)
                             .contentType(contentType)
@@ -142,7 +142,7 @@ class CustomerControllerTest extends BaseControllerTest {
 
     @Test
     void deleteCustomer() {
-        when(customerService.deleteCustomer(CUSTOMER_ID)).thenReturn(customerDeleteResponse);
+        when(customerService.deleteCustomer(CUSTOMER_ID)).thenReturn(1L);
         try {
             mockMvc.perform(delete("/customer/{id}", CUSTOMER_ID))
                     .andExpect(MockMvcResultMatchers.status().isOk());
@@ -156,7 +156,7 @@ class CustomerControllerTest extends BaseControllerTest {
 
     @Test
     void deleteCustomer_noContent() {
-        when(customerService.deleteCustomer(CUSTOMER_ID)).thenReturn(CustomerDeleteResponse.builder().deletedCustomerCount(0L).build());
+        when(customerService.deleteCustomer(CUSTOMER_ID)).thenReturn(0L);
         try {
             mockMvc.perform(delete("/customer/{id}", CUSTOMER_ID))
                     .andExpect(MockMvcResultMatchers.status().isNoContent());
@@ -170,7 +170,7 @@ class CustomerControllerTest extends BaseControllerTest {
 
     @Test
     void deleteAllCustomers() {
-        when(customerService.deleteAllCustomers()).thenReturn(customerDeleteResponse);
+        when(customerService.deleteAllCustomers()).thenReturn(1L);
         try {
             mockMvc.perform(delete("/customers"))
                     .andExpect(MockMvcResultMatchers.status().isOk());
@@ -184,7 +184,7 @@ class CustomerControllerTest extends BaseControllerTest {
 
     @Test
     void deleteAllCustomers_noContent() {
-        when(customerService.deleteAllCustomers()).thenReturn(CustomerDeleteResponse.builder().deletedCustomerCount(0L).build());
+        when(customerService.deleteAllCustomers()).thenReturn(0L);
         try {
             mockMvc.perform(delete("/customers"))
                     .andExpect(MockMvcResultMatchers.status().isNoContent());
